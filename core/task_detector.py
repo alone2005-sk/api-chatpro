@@ -1,238 +1,366 @@
 """
-Task Detection and Classification System
-Analyzes user input to determine the appropriate task type and parameters
+Advanced Task Detection and Intent Analysis
+Automatically detects user intent and task types from natural language
 """
 
 import re
 import json
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
 from enum import Enum
+import logging
+
+logger = logging.getLogger(__name__)
 
 class TaskType(Enum):
     CODE_GENERATION = "code_generation"
+    PROJECT_CREATION = "project_creation"
+    MOBILE_APP = "mobile_app"
     FILE_OPERATION = "file_operation"
-    SHELL_COMMAND = "shell_command"
-    DATA_ANALYSIS = "data_analysis"
-    TEXT_PROCESSING = "text_processing"
-    GENERAL_QUERY = "general_query"
+    CODE_EXECUTION = "code_execution"
+    BUG_FIXING = "bug_fixing"
+    CODE_REVIEW = "code_review"
+    TESTING = "testing"
+    DOCUMENTATION = "documentation"
+    API_CREATION = "api_creation"
+    DATABASE_DESIGN = "database_design"
+    DEPLOYMENT = "deployment"
+    ANALYSIS = "analysis"
+    LEARNING = "learning"
+    GENERAL_CHAT = "general_chat"
+
+class ProjectPlatform(Enum):
+    WEB = "web"
+    MOBILE_ANDROID = "mobile_android"
+    MOBILE_IOS = "mobile_ios"
+    DESKTOP = "desktop"
+    API = "api"
+    ML_AI = "ml_ai"
+    BLOCKCHAIN = "blockchain"
+    GAME = "game"
 
 @dataclass
 class TaskInfo:
     task_type: TaskType
     confidence: float
     parameters: Dict[str, Any]
-    estimated_duration: int  # seconds
-    language: str = None
-    operation: str = None
+    estimated_duration: int
+    complexity_level: int  # 1-5
+    platform: Optional[ProjectPlatform] = None
+    language: Optional[str] = None
+    framework: Optional[str] = None
+    requires_testing: bool = False
+    requires_deployment: bool = False
 
 class TaskDetector:
     def __init__(self):
-        self.patterns = {
+        self.task_patterns = {
             TaskType.CODE_GENERATION: [
                 r"write.*code|generate.*code|create.*function|implement.*algorithm",
-                r"build.*app|develop.*program|code.*solution",
-                r"python.*script|javascript.*function|html.*page"
+                r"build.*function|develop.*method|code.*solution",
+                r"python.*script|javascript.*function|java.*class"
+            ],
+            TaskType.PROJECT_CREATION: [
+                r"create.*project|build.*application|develop.*app",
+                r"full.*stack|complete.*project|entire.*application",
+                r"build.*from.*scratch|new.*project|start.*project"
+            ],
+            TaskType.MOBILE_APP: [
+                r"mobile.*app|android.*app|ios.*app|react.*native",
+                r"flutter.*app|kotlin.*app|swift.*app|mobile.*application",
+                r"app.*store|play.*store|mobile.*development"
             ],
             TaskType.FILE_OPERATION: [
-                r"read.*file|open.*file|load.*file",
-                r"write.*file|save.*file|create.*file",
-                r"edit.*file|modify.*file|update.*file"
+                r"read.*file|write.*file|edit.*file|delete.*file",
+                r"file.*operation|manage.*files|handle.*files"
             ],
-            TaskType.SHELL_COMMAND: [
-                r"run.*command|execute.*command|terminal.*command",
-                r"install.*package|npm.*install|pip.*install",
-                r"git.*clone|git.*commit|docker.*run"
+            TaskType.CODE_EXECUTION: [
+                r"run.*code|execute.*code|test.*code|compile.*code",
+                r"run.*script|execute.*program|test.*function"
             ],
-            TaskType.DATA_ANALYSIS: [
-                r"analyze.*data|data.*analysis|statistical.*analysis",
-                r"plot.*graph|create.*chart|visualize.*data",
-                r"pandas.*dataframe|numpy.*array|matplotlib.*plot"
+            TaskType.BUG_FIXING: [
+                r"fix.*bug|debug.*code|solve.*error|fix.*issue",
+                r"error.*fixing|troubleshoot|resolve.*problem"
             ],
-            TaskType.TEXT_PROCESSING: [
-                r"summarize.*text|translate.*text|rewrite.*text",
-                r"extract.*information|parse.*text|format.*text",
-                r"grammar.*check|spell.*check|proofread"
+            TaskType.TESTING: [
+                r"test.*code|unit.*test|integration.*test|write.*tests",
+                r"testing.*framework|test.*suite|automated.*testing"
+            ],
+            TaskType.API_CREATION: [
+                r"create.*api|build.*api|rest.*api|graphql.*api",
+                r"api.*endpoint|web.*service|microservice"
+            ],
+            TaskType.DATABASE_DESIGN: [
+                r"database.*design|create.*database|sql.*schema",
+                r"data.*model|database.*structure|table.*design"
+            ],
+            TaskType.DEPLOYMENT: [
+                r"deploy.*app|deployment|docker.*container|kubernetes",
+                r"cloud.*deployment|aws.*deploy|heroku.*deploy"
             ]
         }
         
         self.language_patterns = {
-            "python": r"python|\.py|pandas|numpy|django|flask",
-            "javascript": r"javascript|js|node|react|vue|angular",
-            "html": r"html|css|web.*page|website",
-            "sql": r"sql|database|query|select.*from",
-            "bash": r"bash|shell|terminal|command.*line",
-            "java": r"java|\.java|spring|maven",
-            "cpp": r"c\+\+|cpp|\.cpp|\.h",
+            "python": r"python|\.py|django|flask|fastapi|pandas|numpy",
+            "javascript": r"javascript|js|node|react|vue|angular|express",
+            "typescript": r"typescript|ts|tsx|angular|nest",
+            "java": r"java|\.java|spring|maven|gradle|android",
+            "kotlin": r"kotlin|\.kt|android.*kotlin",
+            "swift": r"swift|\.swift|ios|xcode",
+            "dart": r"dart|flutter|\.dart",
             "go": r"golang|go.*lang|\.go",
-            "rust": r"rust|\.rs|cargo"
+            "rust": r"rust|\.rs|cargo",
+            "php": r"php|laravel|symfony|wordpress",
+            "ruby": r"ruby|rails|\.rb",
+            "csharp": r"c#|csharp|\.net|asp\.net|unity",
+            "cpp": r"c\+\+|cpp|\.cpp|\.h",
+            "sql": r"sql|mysql|postgresql|sqlite|database"
+        }
+        
+        self.framework_patterns = {
+            "react": r"react|jsx|create-react-app",
+            "vue": r"vue|vuejs|nuxt",
+            "angular": r"angular|ng|typescript",
+            "django": r"django|python.*web",
+            "flask": r"flask|python.*api",
+            "fastapi": r"fastapi|python.*api",
+            "express": r"express|node.*js|npm",
+            "spring": r"spring|java.*web|maven",
+            "laravel": r"laravel|php.*framework",
+            "rails": r"rails|ruby.*web",
+            "flutter": r"flutter|dart|mobile",
+            "react_native": r"react.*native|mobile.*react"
+        }
+        
+        self.platform_patterns = {
+            ProjectPlatform.WEB: r"web.*app|website|web.*application|frontend|backend",
+            ProjectPlatform.MOBILE_ANDROID: r"android|kotlin|java.*mobile|play.*store",
+            ProjectPlatform.MOBILE_IOS: r"ios|swift|xcode|app.*store|iphone",
+            ProjectPlatform.DESKTOP: r"desktop|electron|tkinter|javafx|wpf",
+            ProjectPlatform.API: r"api|rest|graphql|microservice|web.*service",
+            ProjectPlatform.ML_AI: r"machine.*learning|ai|tensorflow|pytorch|ml",
+            ProjectPlatform.BLOCKCHAIN: r"blockchain|crypto|smart.*contract|web3",
+            ProjectPlatform.GAME: r"game|unity|unreal|pygame|game.*engine"
         }
     
-    async def analyze(self, prompt: str, context: Dict = None) -> TaskInfo:
-        """Analyze prompt to detect task type and extract parameters"""
+    async def initialize(self):
+        """Initialize the task detector"""
+        logger.info("Task Detector initialized")
+    
+    async def analyze_intent(self, prompt: str, context: Dict = None) -> TaskInfo:
+        """Analyze user prompt to detect intent and task type"""
         prompt_lower = prompt.lower()
         
-        # Detect task type
+        # Detect primary task type
         task_type, confidence = self._detect_task_type(prompt_lower)
         
-        # Extract parameters based on task type
+        # Detect platform if applicable
+        platform = self._detect_platform(prompt_lower)
+        
+        # Detect programming language
+        language = self._detect_language(prompt_lower)
+        
+        # Detect framework
+        framework = self._detect_framework(prompt_lower)
+        
+        # Extract parameters
         parameters = self._extract_parameters(prompt, task_type, context)
         
-        # Detect programming language if relevant
-        language = self._detect_language(prompt_lower) if task_type in [
-            TaskType.CODE_GENERATION, TaskType.FILE_OPERATION
-        ] else None
+        # Assess complexity
+        complexity = self._assess_complexity(prompt, task_type)
         
         # Estimate duration
-        duration = self._estimate_duration(task_type, parameters)
+        duration = self._estimate_duration(task_type, complexity, parameters)
+        
+        # Check if testing/deployment is needed
+        requires_testing = self._requires_testing(prompt_lower, task_type)
+        requires_deployment = self._requires_deployment(prompt_lower, task_type)
         
         return TaskInfo(
             task_type=task_type,
             confidence=confidence,
             parameters=parameters,
             estimated_duration=duration,
-            language=language
+            complexity_level=complexity,
+            platform=platform,
+            language=language,
+            framework=framework,
+            requires_testing=requires_testing,
+            requires_deployment=requires_deployment
         )
     
     def _detect_task_type(self, prompt: str) -> tuple[TaskType, float]:
         """Detect the most likely task type"""
         scores = {}
         
-        for task_type, patterns in self.patterns.items():
+        for task_type, patterns in self.task_patterns.items():
             score = 0
             for pattern in patterns:
                 matches = len(re.findall(pattern, prompt, re.IGNORECASE))
                 score += matches
             scores[task_type] = score
         
-        # If no specific patterns match, default to general query
-        if not any(scores.values()):
-            return TaskType.GENERAL_QUERY, 0.5
+        # Special logic for project creation
+        if any(word in prompt for word in ["full", "complete", "entire", "whole"]):
+            scores[TaskType.PROJECT_CREATION] += 2
         
-        # Return highest scoring task type
+        # Special logic for mobile apps
+        if any(word in prompt for word in ["mobile", "android", "ios", "app"]):
+            scores[TaskType.MOBILE_APP] += 2
+        
+        if not any(scores.values()):
+            return TaskType.GENERAL_CHAT, 0.5
+        
         best_task = max(scores, key=scores.get)
-        confidence = min(scores[best_task] / 3.0, 1.0)  # Normalize confidence
+        confidence = min(scores[best_task] / 3.0, 1.0)
         
         return best_task, confidence
     
-    def _detect_language(self, prompt: str) -> str:
-        """Detect programming language from prompt"""
+    def _detect_platform(self, prompt: str) -> Optional[ProjectPlatform]:
+        """Detect target platform"""
+        for platform, pattern in self.platform_patterns.items():
+            if re.search(pattern, prompt, re.IGNORECASE):
+                return platform
+        return None
+    
+    def _detect_language(self, prompt: str) -> Optional[str]:
+        """Detect programming language"""
         for language, pattern in self.language_patterns.items():
             if re.search(pattern, prompt, re.IGNORECASE):
                 return language
-        return "python"  # Default to Python
+        return None
+    
+    def _detect_framework(self, prompt: str) -> Optional[str]:
+        """Detect framework"""
+        for framework, pattern in self.framework_patterns.items():
+            if re.search(pattern, prompt, re.IGNORECASE):
+                return framework
+        return None
     
     def _extract_parameters(self, prompt: str, task_type: TaskType, context: Dict) -> Dict[str, Any]:
         """Extract task-specific parameters"""
         parameters = {}
         
-        if task_type == TaskType.CODE_GENERATION:
+        if task_type == TaskType.PROJECT_CREATION:
             parameters.update({
-                "complexity": self._assess_complexity(prompt),
-                "requires_testing": "test" in prompt.lower(),
-                "requires_documentation": "document" in prompt.lower() or "comment" in prompt.lower()
+                "include_tests": "test" in prompt.lower(),
+                "include_docs": "document" in prompt.lower(),
+                "include_ci_cd": any(word in prompt.lower() for word in ["ci", "cd", "deploy", "pipeline"]),
+                "include_docker": "docker" in prompt.lower(),
+                "database_needed": any(word in prompt.lower() for word in ["database", "db", "sql", "mongo"])
             })
         
-        elif task_type == TaskType.FILE_OPERATION:
-            # Extract file paths
-            file_matches = re.findall(r'["\']([^"\']+\.[a-zA-Z0-9]+)["\']', prompt)
-            if file_matches:
-                parameters["file_path"] = file_matches[0]
-            
-            # Detect operation type
-            if any(word in prompt.lower() for word in ["read", "open", "load"]):
-                parameters["operation"] = "read"
-            elif any(word in prompt.lower() for word in ["write", "save", "create"]):
-                parameters["operation"] = "write"
-            elif any(word in prompt.lower() for word in ["edit", "modify", "update"]):
-                parameters["operation"] = "edit"
-        
-        elif task_type == TaskType.SHELL_COMMAND:
-            # Extract command from prompt
-            command_patterns = [
-                r'run\s+["\']([^"\']+)["\']',
-                r'execute\s+["\']([^"\']+)["\']',
-                r'`([^`]+)`'
-            ]
-            for pattern in command_patterns:
-                match = re.search(pattern, prompt)
-                if match:
-                    parameters["command"] = match.group(1)
-                    break
-        
-        elif task_type == TaskType.DATA_ANALYSIS:
+        elif task_type == TaskType.MOBILE_APP:
             parameters.update({
-                "analysis_type": self._detect_analysis_type(prompt),
-                "requires_visualization": any(word in prompt.lower() for word in ["plot", "chart", "graph", "visualize"])
+                "cross_platform": any(word in prompt.lower() for word in ["flutter", "react native", "cross platform"]),
+                "native": any(word in prompt.lower() for word in ["native", "kotlin", "swift"]),
+                "ui_framework": self._detect_ui_framework(prompt.lower())
             })
         
-        elif task_type == TaskType.TEXT_PROCESSING:
-            if "summarize" in prompt.lower():
-                parameters["operation"] = "summarize"
-            elif "translate" in prompt.lower():
-                parameters["operation"] = "translate"
-            elif "rewrite" in prompt.lower():
-                parameters["operation"] = "rewrite"
-            else:
-                parameters["operation"] = "process"
+        elif task_type == TaskType.API_CREATION:
+            parameters.update({
+                "api_type": "rest" if "rest" in prompt.lower() else "graphql" if "graphql" in prompt.lower() else "rest",
+                "authentication": any(word in prompt.lower() for word in ["auth", "login", "jwt", "oauth"]),
+                "database": any(word in prompt.lower() for word in ["database", "db", "sql"])
+            })
         
         return parameters
     
-    def _assess_complexity(self, prompt: str) -> str:
-        """Assess code complexity based on prompt"""
+    def _detect_ui_framework(self, prompt: str) -> Optional[str]:
+        """Detect UI framework for mobile apps"""
+        ui_frameworks = {
+            "flutter": r"flutter|dart",
+            "react_native": r"react.*native|rn",
+            "native": r"native|kotlin|swift",
+            "ionic": r"ionic|cordova",
+            "xamarin": r"xamarin|c#"
+        }
+        
+        for framework, pattern in ui_frameworks.items():
+            if re.search(pattern, prompt, re.IGNORECASE):
+                return framework
+        
+        return None
+    
+    def _assess_complexity(self, prompt: str, task_type: TaskType) -> int:
+        """Assess project complexity (1-5)"""
         complexity_indicators = {
-            "simple": ["simple", "basic", "easy", "quick"],
-            "medium": ["moderate", "standard", "typical"],
-            "complex": ["complex", "advanced", "sophisticated", "enterprise", "production"]
+            1: ["simple", "basic", "easy", "quick", "minimal"],
+            2: ["standard", "normal", "typical", "regular"],
+            3: ["moderate", "medium", "intermediate", "full"],
+            4: ["complex", "advanced", "comprehensive", "enterprise"],
+            5: ["very complex", "sophisticated", "large scale", "production ready"]
         }
         
         prompt_lower = prompt.lower()
+        
+        # Check for explicit complexity indicators
         for level, indicators in complexity_indicators.items():
             if any(indicator in prompt_lower for indicator in indicators):
                 return level
         
-        # Default assessment based on length and technical terms
-        technical_terms = len(re.findall(r'\b(class|function|algorithm|database|api|framework)\b', prompt_lower))
-        if technical_terms > 3 or len(prompt) > 200:
-            return "complex"
-        elif technical_terms > 1 or len(prompt) > 100:
-            return "medium"
-        else:
-            return "simple"
-    
-    def _detect_analysis_type(self, prompt: str) -> str:
-        """Detect type of data analysis requested"""
-        analysis_types = {
-            "statistical": ["statistics", "statistical", "mean", "median", "correlation"],
-            "visualization": ["plot", "chart", "graph", "visualize", "dashboard"],
-            "machine_learning": ["ml", "machine learning", "predict", "model", "classification"],
-            "exploratory": ["explore", "exploratory", "eda", "data exploration"]
-        }
+        # Assess based on task type and features
+        base_complexity = {
+            TaskType.CODE_GENERATION: 2,
+            TaskType.PROJECT_CREATION: 4,
+            TaskType.MOBILE_APP: 4,
+            TaskType.API_CREATION: 3,
+            TaskType.DATABASE_DESIGN: 3,
+            TaskType.DEPLOYMENT: 3
+        }.get(task_type, 2)
         
-        prompt_lower = prompt.lower()
-        for analysis_type, keywords in analysis_types.items():
-            if any(keyword in prompt_lower for keyword in keywords):
-                return analysis_type
+        # Adjust based on features mentioned
+        feature_count = len(re.findall(r'\b(auth|database|api|test|deploy|docker|ci|cd)\b', prompt_lower))
+        complexity_adjustment = min(feature_count // 2, 2)
         
-        return "general"
+        return min(base_complexity + complexity_adjustment, 5)
     
-    def _estimate_duration(self, task_type: TaskType, parameters: Dict) -> int:
+    def _estimate_duration(self, task_type: TaskType, complexity: int, parameters: Dict) -> int:
         """Estimate task duration in seconds"""
         base_durations = {
-            TaskType.CODE_GENERATION: 30,
-            TaskType.FILE_OPERATION: 5,
-            TaskType.SHELL_COMMAND: 10,
-            TaskType.DATA_ANALYSIS: 45,
-            TaskType.TEXT_PROCESSING: 15,
-            TaskType.GENERAL_QUERY: 10
+            TaskType.CODE_GENERATION: 60,
+            TaskType.PROJECT_CREATION: 600,
+            TaskType.MOBILE_APP: 900,
+            TaskType.FILE_OPERATION: 10,
+            TaskType.CODE_EXECUTION: 30,
+            TaskType.BUG_FIXING: 120,
+            TaskType.TESTING: 180,
+            TaskType.API_CREATION: 300,
+            TaskType.DATABASE_DESIGN: 240,
+            TaskType.DEPLOYMENT: 180,
+            TaskType.GENERAL_CHAT: 20
         }
         
-        base_duration = base_durations.get(task_type, 20)
+        base_duration = base_durations.get(task_type, 60)
+        complexity_multiplier = complexity * 0.5
         
-        # Adjust based on complexity
-        if task_type == TaskType.CODE_GENERATION:
-            complexity = parameters.get("complexity", "simple")
-            multipliers = {"simple": 1.0, "medium": 2.0, "complex": 4.0}
-            base_duration *= multipliers.get(complexity, 1.0)
+        return int(base_duration * complexity_multiplier)
+    
+    def _requires_testing(self, prompt: str, task_type: TaskType) -> bool:
+        """Check if task requires testing"""
+        test_indicators = ["test", "testing", "unit test", "integration test", "automated test"]
         
-        return int(base_duration)
+        if any(indicator in prompt for indicator in test_indicators):
+            return True
+        
+        # Automatically require testing for certain task types
+        return task_type in [TaskType.PROJECT_CREATION, TaskType.API_CREATION, TaskType.MOBILE_APP]
+    
+    def _requires_deployment(self, prompt: str, task_type: TaskType) -> bool:
+        """Check if task requires deployment"""
+        deploy_indicators = ["deploy", "deployment", "production", "live", "host", "cloud"]
+        
+        if any(indicator in prompt for indicator in deploy_indicators):
+            return True
+        
+        return task_type in [TaskType.PROJECT_CREATION, TaskType.API_CREATION]
+    
+    async def get_status(self) -> Dict[str, Any]:
+        """Get task detector status"""
+        return {
+            "supported_task_types": [task.value for task in TaskType],
+            "supported_platforms": [platform.value for platform in ProjectPlatform],
+            "supported_languages": list(self.language_patterns.keys()),
+            "supported_frameworks": list(self.framework_patterns.keys()),
+            "status": "ready"
+        }

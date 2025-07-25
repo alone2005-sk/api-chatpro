@@ -1,13 +1,51 @@
 """
 AI Logger - Comprehensive logging and monitoring system
+Logging configuration for DAMN BOT
 """
 
 import json
 import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import logging
+import sys
+
+def setup_logging(level: str = "INFO", log_file: Optional[str] = None):
+    """Setup logging configuration"""
+    
+    # Create logs directory
+    logs_dir = Path("logs")
+    logs_dir.mkdir(exist_ok=True)
+    
+    # Configure logging
+    log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    
+    # Set up handlers
+    handlers = [logging.StreamHandler(sys.stdout)]
+    
+    if log_file:
+        handlers.append(logging.FileHandler(log_file))
+    else:
+        # Default log file with timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        handlers.append(logging.FileHandler(logs_dir / f"damn_bot_{timestamp}.log"))
+    
+    # Configure root logger
+    logging.basicConfig(
+        level=getattr(logging, level.upper()),
+        format=log_format,
+        handlers=handlers
+    )
+    
+    # Set specific logger levels
+    logging.getLogger("uvicorn").setLevel(logging.WARNING)
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("asyncio").setLevel(logging.WARNING)
+
+def get_logger(name: str) -> logging.Logger:
+    """Get logger instance"""
+    return logging.getLogger(name)
 
 class AILogger:
     def __init__(self):
@@ -15,16 +53,9 @@ class AILogger:
         self.logs_dir.mkdir(exist_ok=True)
         
         # Setup file logging
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-            handlers=[
-                logging.FileHandler(self.logs_dir / "ai_backend.log"),
-                logging.StreamHandler()
-            ]
-        )
+        setup_logging(log_file=self.logs_dir / "ai_backend.log")
         
-        self.logger = logging.getLogger("AIBackend")
+        self.logger = get_logger("AIBackend")
         self.task_logs = {}
     
     def generate_task_id(self) -> str:

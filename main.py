@@ -1,336 +1,307 @@
 """
-Advanced AI Agent Backend - Main FastAPI Application
-Comprehensive AI system with multi-format analysis, project generation, and learning capabilities
+DAMN BOT - Professional All-in-One AI Chat Agent
+FastAPI backend with multi-LLM orchestration, file processing, web search, and voice generation
 """
 
 import os
 import asyncio
 import logging
-from datetime import datetime
 from contextlib import asynccontextmanager
+from datetime import datetime
 from typing import Dict, List, Optional, Any
 
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, UploadFile, File, Form
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi.responses import JSONResponse, StreamingResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
+import uvicorn
 
-from core.database import get_db, init_database
-from core.file_processor import FileProcessor
-from core.llm_orchestrator import LLMOrchestrator
-from core.project_generator import ProjectGenerator
-from core.code_tester import CodeTester
-from core.learning_engine import LearningEngine
-from core.session_manager import SessionManager
-from core.quality_scorer import QualityScorer
-from models.requests import *
-from models.responses import *
+from core.config import Settings
+from core.database import DatabaseManager, init_database
+from core.logger import setup_logging, get_logger
 from services.chat_service import ChatService
-from services.analysis_service import AnalysisService
-from services.history_service import HistoryService
-from services.fix_service import FixService
-from utils.auth import verify_token
-from utils.logger import setup_logging
+from services.llm_orchestrator import LLMOrchestrator
+from services.file_processor import FileProcessor
+from services.web_search import WebSearchService
+from services.voice_service import VoiceService
+from services.code_service import CodeService
+from services.research_service import ResearchService
+from services.deep_learning_service import DeepLearningService
+from models.requests import ChatRequest, ChatResponse
+from middleware.security import SecurityMiddleware
+from middleware.rate_limiter import RateLimiter
 
-# Setup logging
-setup_logging()
-logger = logging.getLogger(__name__)
+# Initialize settings and logging
+settings = Settings()
+setup_logging(settings.LOG_LEVEL)
+logger = get_logger(__name__)
 
-# Security
-security = HTTPBearer()
-
-# Global components
-file_processor = FileProcessor()
-llm_orchestrator = LLMOrchestrator()
-project_generator = ProjectGenerator()
-code_tester = CodeTester()
-learning_engine = LearningEngine()
-session_manager = SessionManager()
-quality_scorer = QualityScorer()
+# Global service instances
+chat_service = None
+llm_orchestrator = None
+file_processor = None
+web_search_service = None
+voice_service = None
+code_service = None
+research_service = None
+deep_learning_service = None
+db_manager = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifecycle management"""
-    logger.info("🚀 Starting Advanced AI Agent Backend...")
+    global chat_service, llm_orchestrator, file_processor, web_search_service
+    global voice_service, code_service, research_service, deep_learning_service, db_manager
     
-    # Initialize database
-    await init_database()
+    logger.info("🚀 Starting DAMN BOT AI Chat Agent...")
     
-    # Initialize components
-    await file_processor.initialize()
-    await llm_orchestrator.initialize()
-    await project_generator.initialize()
-    await code_tester.initialize()
-    await learning_engine.initialize()
-    
-    logger.info("✅ All systems ready!")
+    try:
+        # Initialize database
+        db_manager = DatabaseManager(settings.DATABASE_URL)
+        await init_database(db_manager)
+        
+        # Initialize all services
+        llm_orchestrator = LLMOrchestrator(settings)
+        await llm_orchestrator.initialize()
+        
+        file_processor = FileProcessor(settings)
+        await file_processor.initialize()
+        
+        web_search_service = WebSearchService(settings)
+        await web_search_service.initialize()
+        
+        voice_service = VoiceService(settings)
+        await voice_service.initialize()
+        
+        code_service = CodeService(settings)
+        await code_service.initialize()
+        
+        research_service = ResearchService(settings, web_search_service, llm_orchestrator)
+        await research_service.initialize()
+        
+        deep_learning_service = DeepLearningService(settings)
+        await deep_learning_service.initialize()
+        
+        chat_service = ChatService(
+            db_manager=db_manager,
+            llm_orchestrator=llm_orchestrator,
+            file_processor=file_processor,
+            web_search_service=web_search_service,
+            voice_service=voice_service,
+            code_service=code_service,
+            research_service=research_service,
+            deep_learning_service=deep_learning_service,
+            settings=settings
+        )
+        
+        logger.info("✅ DAMN BOT AI Chat Agent is ready!")
+        
+    except Exception as e:
+        logger.error(f"❌ Failed to initialize DAMN BOT: {str(e)}")
+        raise
     
     yield
     
     # Cleanup
-    logger.info("🔄 Shutting down...")
-    await llm_orchestrator.cleanup()
-    await code_tester.cleanup()
-    logger.info("✅ Shutdown complete!")
+    logger.info("🔄 Shutting down DAMN BOT...")
+    if llm_orchestrator:
+        await llm_orchestrator.cleanup()
+    if voice_service:
+        await voice_service.cleanup()
+    if code_service:
+        await code_service.cleanup()
+    if deep_learning_service:
+        await deep_learning_service.cleanup()
+    if db_manager:
+        await db_manager.close()
+    logger.info("✅ DAMN BOT shutdown complete!")
 
+# Create FastAPI app
 app = FastAPI(
-    title="Advanced AI Agent Backend",
-    description="Comprehensive AI system with multi-format analysis and project generation",
-    version="2.0.0",
-    lifespan=lifespan
+    title="DAMN BOT - AI Chat Agent",
+    description="Professional All-in-One AI Chat Agent with Multi-LLM Orchestration",
+    version="1.0.0",
+    lifespan=lifespan,
+    docs_url="/docs" if settings.DEBUG else None,
+    redoc_url="/redoc" if settings.DEBUG else None
 )
 
-# CORS middleware
+# Add middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"]
 )
 
-# Services
-chat_service = ChatService()
-analysis_service = AnalysisService()
-history_service = HistoryService()
-fix_service = FixService()
+app.add_middleware(SecurityMiddleware)
+app.add_middleware(RateLimiter, calls=settings.RATE_LIMIT_CALLS, period=settings.RATE_LIMIT_PERIOD)
 
-@app.post("/api/v1/chat", response_model=ChatResponse)
+# Mount static files
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(
-    request: ChatRequest,
     background_tasks: BackgroundTasks,
-    db: AsyncSession = Depends(get_db),
-    credentials: HTTPAuthorizationCredentials = Depends(security)
+    prompt: Optional[str] = Form(None),
+    files: List[UploadFile] = File(None),
+    web_search: bool = Form(False),
+    voice: bool = Form(False),
+    project_id: Optional[str] = Form(None),
+    stream: bool = Form(False),
+    research_mode: bool = Form(False),
+    deep_learning: bool = Form(False),
+    code_execution: bool = Form(True),
+    auto_fix: bool = Form(True),
+    language: Optional[str] = Form("auto"),
+    max_iterations: int = Form(3)
 ):
-    """Main chat endpoint - handles text prompts and conversations"""
+    """
+    Unified AI Chat endpoint - handles all AI tasks through a single interface
+    
+    Features:
+    - Multi-LLM orchestration with intelligent response merging
+    - File processing (PDF, DOCX, TXT, audio, video, images)
+    - Web search integration with live results
+    - Voice generation with multiple TTS engines
+    - Code generation with auto-testing and fixing
+    - Research mode with deep analysis
+    - Deep learning integration for specialized tasks
+    - Session tracking and history management
+    - Streaming responses support
+    """
     try:
-        # Verify authentication
-        user_id = await verify_token(credentials.credentials)
+        # Validate input
+        if not prompt and not files:
+            raise HTTPException(
+                status_code=400,
+                detail="Either prompt or files must be provided"
+            )
         
-        # Process chat request
-        response = await chat_service.process_chat(
-            request=request,
-            user_id=user_id,
-            db=db,
-            background_tasks=background_tasks
+        # Create chat request
+        chat_request = ChatRequest(
+            prompt=prompt or "",
+            files=files or [],
+            web_search=web_search,
+            voice=voice,
+            project_id=project_id,
+            stream=stream,
+            research_mode=research_mode,
+            deep_learning=deep_learning,
+            code_execution=code_execution,
+            auto_fix=auto_fix,
+            language=language,
+            max_iterations=max_iterations
         )
         
-        return response
-        
+        # Process chat request
+        if stream:
+            return StreamingResponse(
+                chat_service.process_chat_stream(chat_request),
+                media_type="text/event-stream"
+            )
+        else:
+            response = await chat_service.process_chat(chat_request)
+            
+            # Add background tasks for cleanup and learning
+            background_tasks.add_task(
+                chat_service.post_process_cleanup,
+                chat_request.project_id or response.project_id
+            )
+            
+            return response
+            
     except Exception as e:
         logger.error(f"Chat endpoint error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/v1/analyze", response_model=AnalysisResponse)
-async def analyze_endpoint(
-    files: List[UploadFile] = File(...),
-    prompt: str = Form(...),
-    project_id: Optional[str] = Form(None),
-    background_tasks: BackgroundTasks = BackgroundTasks(),
-    db: AsyncSession = Depends(get_db),
-    credentials: HTTPAuthorizationCredentials = Depends(security)
-):
-    """File analysis endpoint - handles multi-format file uploads"""
-    try:
-        user_id = await verify_token(credentials.credentials)
-        
-        request = AnalysisRequest(
-            files=files,
-            prompt=prompt,
-            project_id=project_id
-        )
-        
-        response = await analysis_service.analyze_files(
-            request=request,
-            user_id=user_id,
-            db=db,
-            background_tasks=background_tasks
-        )
-        
-        return response
-        
-    except Exception as e:
-        logger.error(f"Analysis endpoint error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/v1/history/{project_id}", response_model=HistoryResponse)
-async def get_history(
-    project_id: str,
-    db: AsyncSession = Depends(get_db),
-    credentials: HTTPAuthorizationCredentials = Depends(security)
-):
-    """Get complete project/chat history"""
-    try:
-        user_id = await verify_token(credentials.credentials)
-        
-        history = await history_service.get_project_history(
-            project_id=project_id,
-            user_id=user_id,
-            db=db
-        )
-        
-        return history
-        
-    except Exception as e:
-        logger.error(f"History endpoint error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/api/v1/fix", response_model=FixResponse)
-async def fix_endpoint(
-    request: FixRequest,
-    background_tasks: BackgroundTasks,
-    db: AsyncSession = Depends(get_db),
-    credentials: HTTPAuthorizationCredentials = Depends(security)
-):
-    """Automatic error analysis and code fixing"""
-    try:
-        user_id = await verify_token(credentials.credentials)
-        
-        response = await fix_service.fix_code_errors(
-            request=request,
-            user_id=user_id,
-            db=db,
-            background_tasks=background_tasks
-        )
-        
-        return response
-        
-    except Exception as e:
-        logger.error(f"Fix endpoint error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/api/v1/snapshot", response_model=SnapshotResponse)
-async def create_snapshot(
-    request: SnapshotRequest,
-    db: AsyncSession = Depends(get_db),
-    credentials: HTTPAuthorizationCredentials = Depends(security)
-):
-    """Save progress snapshots"""
-    try:
-        user_id = await verify_token(credentials.credentials)
-        
-        snapshot = await session_manager.create_snapshot(
-            request=request,
-            user_id=user_id,
-            db=db
-        )
-        
-        return snapshot
-        
-    except Exception as e:
-        logger.error(f"Snapshot endpoint error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/v1/projects/{project_id}/stream")
-async def stream_project_progress(
-    project_id: str,
-    credentials: HTTPAuthorizationCredentials = Depends(security)
-):
-    """Stream real-time project generation progress"""
-    try:
-        user_id = await verify_token(credentials.credentials)
-        
-        async def event_stream():
-            async for event in session_manager.stream_progress(project_id, user_id):
-                yield f"data: {event}\n\n"
-        
-        return StreamingResponse(event_stream(), media_type="text/event-stream")
-        
-    except Exception as e:
-        logger.error(f"Stream endpoint error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/api/v1/generate-project", response_model=ProjectResponse)
-async def generate_project(
-    request: ProjectRequest,
-    background_tasks: BackgroundTasks,
-    db: AsyncSession = Depends(get_db),
-    credentials: HTTPAuthorizationCredentials = Depends(security)
-):
-    """Generate complete professional projects"""
-    try:
-        user_id = await verify_token(credentials.credentials)
-        
-        # Start project generation in background
-        project_id = await project_generator.start_generation(
-            request=request,
-            user_id=user_id,
-            db=db
-        )
-        
-        background_tasks.add_task(
-            project_generator.generate_complete_project,
-            project_id=project_id,
-            request=request,
-            user_id=user_id,
-            db=db
-        )
-        
-        return ProjectResponse(
-            project_id=project_id,
-            status="started",
-            message="Project generation started"
-        )
-        
-    except Exception as e:
-        logger.error(f"Project generation error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/v1/llm-performance")
-async def get_llm_performance(
-    credentials: HTTPAuthorizationCredentials = Depends(security)
-):
-    """Get LLM performance statistics and rankings"""
-    try:
-        await verify_token(credentials.credentials)
-        
-        performance = await quality_scorer.get_performance_stats()
-        return JSONResponse(performance)
-        
-    except Exception as e:
-        logger.error(f"Performance endpoint error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/v1/learning-insights")
-async def get_learning_insights(
-    credentials: HTTPAuthorizationCredentials = Depends(security)
-):
-    """Get learning engine insights and improvements"""
-    try:
-        await verify_token(credentials.credentials)
-        
-        insights = await learning_engine.get_insights()
-        return JSONResponse(insights)
-        
-    except Exception as e:
-        logger.error(f"Learning insights error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/v1/system/status")
-async def system_status():
-    """Get comprehensive system status"""
+@app.get("/status")
+async def health_check():
+    """System health check endpoint"""
     try:
         status = {
-            "status": "online",
+            "status": "healthy",
             "timestamp": datetime.now().isoformat(),
-            "components": {
-                "file_processor": await file_processor.get_status(),
-                "llm_orchestrator": await llm_orchestrator.get_status(),
-                "project_generator": await project_generator.get_status(),
-                "code_tester": await code_tester.get_status(),
-                "learning_engine": await learning_engine.get_status()
-            },
-            "active_sessions": await session_manager.get_active_count(),
-            "total_projects": await history_service.get_total_projects()
+            "version": "1.0.0",
+            "services": {}
         }
+        
+        # Check service health
+        if llm_orchestrator:
+            status["services"]["llm_orchestrator"] = await llm_orchestrator.health_check()
+        if file_processor:
+            status["services"]["file_processor"] = await file_processor.health_check()
+        if web_search_service:
+            status["services"]["web_search"] = await web_search_service.health_check()
+        if voice_service:
+            status["services"]["voice"] = await voice_service.health_check()
+        if code_service:
+            status["services"]["code"] = await code_service.health_check()
+        if research_service:
+            status["services"]["research"] = await research_service.health_check()
+        if deep_learning_service:
+            status["services"]["deep_learning"] = await deep_learning_service.health_check()
         
         return JSONResponse(status)
         
     except Exception as e:
-        logger.error(f"System status error: {str(e)}")
+        logger.error(f"Health check error: {str(e)}")
+        return JSONResponse(
+            {"status": "unhealthy", "error": str(e)},
+            status_code=500
+        )
+
+@app.get("/projects/{project_id}/history")
+async def get_project_history(project_id: str):
+    """Get complete project history and artifacts"""
+    try:
+        history = await chat_service.get_project_history(project_id)
+        return JSONResponse(history)
+    except Exception as e:
+        logger.error(f"Project history error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/projects/{project_id}/download")
+async def download_project_artifacts(project_id: str):
+    """Download project artifacts as ZIP file"""
+    try:
+        zip_path = await chat_service.create_project_zip(project_id)
+        return FileResponse(
+            zip_path,
+            filename=f"project_{project_id}.zip",
+            media_type="application/zip"
+        )
+    except Exception as e:
+        logger.error(f"Download error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/metrics")
+async def get_metrics():
+    """Get system metrics and statistics"""
+    try:
+        metrics = await chat_service.get_system_metrics()
+        return JSONResponse(metrics)
+    except Exception as e:
+        logger.error(f"Metrics error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/models")
+async def get_available_models():
+    """Get available LLM models and their status"""
+    try:
+        models = await llm_orchestrator.get_available_models()
+        return JSONResponse(models)
+    except Exception as e:
+        logger.error(f"Models error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=500, reload=True)
+    uvicorn.run(
+        "main:app",
+        host=settings.HOST,
+        port=settings.PORT,
+        reload=settings.DEBUG,
+        log_level=settings.LOG_LEVEL.lower()
+    )
