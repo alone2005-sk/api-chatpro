@@ -1,0 +1,57 @@
+2025-08-06 08:33:05,671 - middleware.security - INFO - SecurityMiddleware initialized with secret_key: default_secret
+2025-08-06 08:33:05,671 - main - INFO - 🚀 Starting DAMN BOT AI Chat Agent...
+2025-08-06 08:33:05,687 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-08-06 08:33:05,688 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-08-06 08:33:05,689 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 08:33:05,690 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 08:33:05,785 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 08:33:05,785 - services.local_llm_service - INFO - Local LLM service initialized
+2025-08-06 08:33:05,785 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-08-06 08:33:06,389 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 08:33:07,905 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 08:33:08,481 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 08:33:08,776 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 08:33:09,078 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 08:33:09,397 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 08:33:09,397 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-08-06 08:33:09,398 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-08-06 08:33:09,399 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-08-06 08:33:09,411 - main - INFO - ✅ DAMN BOT AI Chat Agent is ready!
+2025-08-06 08:33:12,709 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDY5MTkyLCJleHAiOjE3NTQ0NzI3OTJ9.WbQrKRzSYdgrD93QvKOPHXa1gL4_cT10_cdqIyFqCHI
+2025-08-06 08:33:12,709 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754469192, 'exp': 1754472792}
+2025-08-06 08:33:12,712 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 08:33:12,712 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 08:33:12,713 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 08:33:14,058 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 08:33:15,380 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 08:33:15,695 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 08:33:15,939 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 08:33:16,227 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 08:33:16,612 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 08:33:16,612 - main - ERROR - Health check error: 'ResearchService' object has no attribute 'health_check'
+2025-08-06 08:33:16,615 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDY5MTkyLCJleHAiOjE3NTQ0NzI3OTJ9.WbQrKRzSYdgrD93QvKOPHXa1gL4_cT10_cdqIyFqCHI
+2025-08-06 08:33:16,615 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754469192, 'exp': 1754472792}
+2025-08-06 08:33:16,631 - services.chat_service - INFO - Processing chat request for project test_project_123
+2025-08-06 08:33:16,636 - services.chat_service - INFO - Detected task: TaskType.GENERAL_CHAT (confidence: 0.5)
+2025-08-06 08:33:16,636 - services.chat_service - INFO - Enabling research mode
+2025-08-06 08:33:16,636 - services.research_service - INFO - Starting research on topic: What time is it in Tokyo right now?
+2025-08-06 08:33:16,636 - services.web_search - ERROR - DuckDuckGo search failed: 'Settings' object has no attribute 'USER_AGENT'
+2025-08-06 08:33:16,636 - services.web_search - ERROR - DuckDuckGo HTML scrape failed: 'Settings' object has no attribute 'USER_AGENT'
+2025-08-06 08:33:17,281 - arxiv - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=What+time+is+it+in+Tokyo+right+now%3F&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2025-08-06 08:33:17,517 - arxiv - INFO - Got first page: 1 of 2750528 total results
+2025-08-06 08:33:17,517 - arxiv - INFO - Sleeping: 2.996541 seconds
+2025-08-06 08:33:20,514 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=What+time+is+it+in+Tokyo+right+now%3F&id_list=&sortBy=relevance&sortOrder=descending&start=1&max_results=100
+2025-08-06 08:33:20,723 - services.web_search - ERROR - DuckDuckGo search failed: 'Settings' object has no attribute 'USER_AGENT'
+2025-08-06 08:33:20,723 - services.web_search - ERROR - DuckDuckGo HTML scrape failed: 'Settings' object has no attribute 'USER_AGENT'
+2025-08-06 08:33:21,078 - services.web_search - ERROR - DuckDuckGo search failed: 'Settings' object has no attribute 'USER_AGENT'
+2025-08-06 08:33:21,078 - services.web_search - ERROR - DuckDuckGo HTML scrape failed: 'Settings' object has no attribute 'USER_AGENT'
+2025-08-06 08:33:21,534 - services.web_search - ERROR - DuckDuckGo search failed: 'Settings' object has no attribute 'USER_AGENT'
+2025-08-06 08:33:21,534 - services.web_search - ERROR - DuckDuckGo HTML scrape failed: 'Settings' object has no attribute 'USER_AGENT'
+2025-08-06 08:33:21,974 - services.research_service - ERROR - Research analysis failed: LLMOrchestrator.generate_response() got an unexpected keyword argument 'provider'
+2025-08-06 08:33:21,975 - services.research_service - ERROR - Summary generation failed: LLMOrchestrator.generate_response() got an unexpected keyword argument 'provider'
+2025-08-06 08:33:21,975 - services.research_service - INFO - Research completed for topic: What time is it in Tokyo right now?
+2025-08-06 08:33:21,975 - services.chat_service - INFO - Generating response with multi-LLM orchestration
+2025-08-06 08:33:21,975 - services.llm_orchestrator - INFO - Generating response with models: ['together', 'openrouter', 'groq']
+2025-08-06 08:33:23,800 - services.chat_service - INFO - Chat processing completed in 7.18s
+2025-08-06 08:33:23,801 - services.chat_service - INFO - Cleanup completed for project test_project_123
+2025-08-06 08:33:44,705 - main - INFO - 🔄 Shutting down DAMN BOT...

@@ -1,0 +1,24 @@
+2025-08-06 06:29:15,258 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-08-06 06:29:15,258 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-08-06 06:29:15,261 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 06:29:15,261 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 06:29:15,262 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 06:29:15,262 - services.local_llm_service - INFO - Local LLM service initialized
+2025-08-06 06:29:15,262 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-08-06 06:29:15,951 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 06:29:17,491 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 06:29:17,818 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 06:29:18,090 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 06:29:18,421 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 06:29:18,746 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 06:29:18,746 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-08-06 06:29:18,748 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-08-06 06:29:18,748 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-08-06 06:29:18,774 - services.chat_service - INFO - Processing chat request for project test_project_123
+2025-08-06 06:29:18,779 - services.chat_service - INFO - Detected task: TaskType.GENERAL_CHAT (confidence: 0.5)
+2025-08-06 06:29:18,779 - services.chat_service - INFO - Generating response with multi-LLM orchestration
+2025-08-06 06:29:18,779 - services.llm_orchestrator - INFO - Generating response with models: ['llamacpp', 'gpt4all', 'together']
+2025-08-06 06:29:18,779 - services.llm_orchestrator - ERROR - Local LLM error (llamacpp): Local model llamacpp is not available
+2025-08-06 06:29:18,780 - services.llm_orchestrator - ERROR - Local LLM error (gpt4all): Local model gpt4all is not available
+2025-08-06 06:29:21,172 - services.chat_service - ERROR - Chat processing error: greenlet_spawn has not been called; can't call await_only() here. Was IO attempted in an unexpected place? (Background on this error at: https://sqlalche.me/e/20/xd2s)
+2025-08-06 06:29:21,172 - main - ERROR - Chat endpoint error: greenlet_spawn has not been called; can't call await_only() here. Was IO attempted in an unexpected place? (Background on this error at: https://sqlalche.me/e/20/xd2s)

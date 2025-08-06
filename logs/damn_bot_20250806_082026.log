@@ -1,0 +1,40 @@
+2025-08-06 08:20:26,636 - middleware.security - INFO - SecurityMiddleware initialized with secret_key: default_secret
+2025-08-06 08:20:26,637 - main - INFO - 🚀 Starting DAMN BOT AI Chat Agent...
+2025-08-06 08:20:26,656 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-08-06 08:20:26,656 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-08-06 08:20:26,659 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 08:20:26,660 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 08:20:26,771 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 08:20:26,771 - services.local_llm_service - INFO - Local LLM service initialized
+2025-08-06 08:20:26,771 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-08-06 08:20:27,422 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 08:20:28,833 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 08:20:32,383 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 08:20:32,663 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 08:20:33,021 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 08:20:33,361 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 08:20:33,361 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-08-06 08:20:33,362 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-08-06 08:20:33,362 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-08-06 08:20:33,375 - main - INFO - ✅ DAMN BOT AI Chat Agent is ready!
+2025-08-06 08:20:33,379 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDY4NDMwLCJleHAiOjE3NTQ0NzIwMzB9.2pd5fkTai-Dkhsyds1sx6Gg-mQArP-R9X81p2YoSxv8
+2025-08-06 08:20:33,380 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754468430, 'exp': 1754472030}
+2025-08-06 08:20:33,381 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 08:20:33,381 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 08:20:33,381 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 08:20:33,747 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 08:20:35,229 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 08:20:35,584 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 08:20:35,836 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 08:20:36,137 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 08:20:36,472 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 08:20:36,475 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDY4NDMwLCJleHAiOjE3NTQ0NzIwMzB9.2pd5fkTai-Dkhsyds1sx6Gg-mQArP-R9X81p2YoSxv8
+2025-08-06 08:20:36,475 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754468430, 'exp': 1754472030}
+2025-08-06 08:20:36,492 - services.chat_service - INFO - Processing chat request for project test_project_123
+2025-08-06 08:20:36,496 - services.chat_service - INFO - Detected task: TaskType.GENERAL_CHAT (confidence: 0.5)
+2025-08-06 08:20:36,497 - services.chat_service - INFO - Performing web search
+2025-08-06 08:20:36,497 - services.web_search - ERROR - DuckDuckGo search failed: 'Settings' object has no attribute 'USER_AGENT'
+2025-08-06 08:20:36,497 - services.web_search - ERROR - DuckDuckGo HTML scrape failed: 'Settings' object has no attribute 'USER_AGENT'
+2025-08-06 08:20:37,184 - services.chat_service - ERROR - Chat processing error: 'ChatRequest' object has no attribute 'deep_research'
+2025-08-06 08:20:37,184 - main - ERROR - Chat endpoint error: 'ChatRequest' object has no attribute 'deep_research'
+2025-08-06 08:21:07,692 - main - INFO - 🔄 Shutting down DAMN BOT...

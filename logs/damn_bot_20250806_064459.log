@@ -1,0 +1,50 @@
+2025-08-06 06:44:59,827 - middleware.security - INFO - SecurityMiddleware initialized with secret_key: default_secret
+2025-08-06 06:44:59,827 - main - INFO - 🚀 Starting DAMN BOT AI Chat Agent...
+2025-08-06 06:44:59,938 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-08-06 06:44:59,938 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-08-06 06:44:59,940 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 06:44:59,940 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 06:44:59,940 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 06:44:59,940 - services.local_llm_service - INFO - Local LLM service initialized
+2025-08-06 06:44:59,940 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-08-06 06:45:00,393 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 06:45:01,987 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 06:45:02,302 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 06:45:02,590 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 06:45:02,968 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 06:45:03,327 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 06:45:03,327 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-08-06 06:45:03,329 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-08-06 06:45:03,329 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-08-06 06:45:03,342 - main - INFO - ✅ DAMN BOT AI Chat Agent is ready!
+2025-08-06 06:45:03,347 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDYyNjk5LCJleHAiOjE3NTQ0NjYyOTl9.vORg23SxyHQ7OPCiR73y7CGz1dUiP9PyWGCJCKW1K_8
+2025-08-06 06:45:03,347 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754462699, 'exp': 1754466299}
+2025-08-06 06:45:03,349 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 06:45:03,349 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 06:45:03,349 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 06:45:03,718 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 06:45:05,294 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 06:45:05,616 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 06:45:05,858 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 06:45:06,180 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 06:45:06,474 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 06:45:06,476 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDYyNjk5LCJleHAiOjE3NTQ0NjYyOTl9.vORg23SxyHQ7OPCiR73y7CGz1dUiP9PyWGCJCKW1K_8
+2025-08-06 06:45:06,477 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754462699, 'exp': 1754466299}
+2025-08-06 06:45:06,500 - services.chat_service - INFO - Processing chat request for project f1050cff-3f6a-44ad-a690-de89c8384948
+2025-08-06 06:45:06,505 - services.chat_service - INFO - Detected task: TaskType.GENERAL_CHAT (confidence: 0.5)
+2025-08-06 06:45:06,505 - services.chat_service - INFO - Generating response with multi-LLM orchestration
+2025-08-06 06:45:06,505 - services.llm_orchestrator - INFO - Generating response with models: ['together', 'openrouter', 'groq']
+2025-08-06 06:45:08,241 - services.chat_service - ERROR - Chat processing error: greenlet_spawn has not been called; can't call await_only() here. Was IO attempted in an unexpected place? (Background on this error at: https://sqlalche.me/e/20/xd2s)
+2025-08-06 06:45:08,242 - main - ERROR - Chat endpoint error: greenlet_spawn has not been called; can't call await_only() here. Was IO attempted in an unexpected place? (Background on this error at: https://sqlalche.me/e/20/xd2s)
+2025-08-06 06:45:08,243 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDYyNjk5LCJleHAiOjE3NTQ0NjYyOTl9.vORg23SxyHQ7OPCiR73y7CGz1dUiP9PyWGCJCKW1K_8
+2025-08-06 06:45:08,243 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754462699, 'exp': 1754466299}
+2025-08-06 06:45:08,245 - main - ERROR - Project history error: Project example_project_id not found
+2025-08-06 06:45:08,246 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDYyNjk5LCJleHAiOjE3NTQ0NjYyOTl9.vORg23SxyHQ7OPCiR73y7CGz1dUiP9PyWGCJCKW1K_8
+2025-08-06 06:45:08,246 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754462699, 'exp': 1754466299}
+2025-08-06 06:45:08,247 - main - ERROR - Download error: Project example_project_id not found
+2025-08-06 06:45:08,248 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDYyNjk5LCJleHAiOjE3NTQ0NjYyOTl9.vORg23SxyHQ7OPCiR73y7CGz1dUiP9PyWGCJCKW1K_8
+2025-08-06 06:45:08,248 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754462699, 'exp': 1754466299}
+2025-08-06 06:45:08,249 - main - ERROR - Metrics error: 'AsyncSession' object has no attribute 'query'
+2025-08-06 06:45:08,252 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDYyNjk5LCJleHAiOjE3NTQ0NjYyOTl9.vORg23SxyHQ7OPCiR73y7CGz1dUiP9PyWGCJCKW1K_8
+2025-08-06 06:45:08,252 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754462699, 'exp': 1754466299}
+2025-08-06 06:46:18,999 - main - INFO - 🔄 Shutting down DAMN BOT...

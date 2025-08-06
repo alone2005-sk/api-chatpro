@@ -1,7 +1,7 @@
 """
 Multi-LLM orchestration service with intelligent response merging
 """
-
+from cachetools import TTLCache
 import asyncio
 import json
 import time
@@ -28,20 +28,18 @@ class LLMResponse:
 
 class LLMOrchestrator:
     """Orchestrates multiple LLMs for optimal response generation"""
-    
+
     def __init__(self, settings):
         self.settings = settings
         self.local_llm = LocalLLMService(settings)
         self.remote_llm = RemoteLLMService(settings)
         self.response_merger = ResponseMerger(settings)
-        
+
         # LLM priority and configuration
         self.llm_priority = [
-            # Local LLMs (preferred)
-            {"provider": "local", "model": "ollama", "weight": 1.0},
-            {"provider": "local", "model": "llamacpp", "weight": 0.9},
-            {"provider": "local", "model": "gpt4all", "weight": 0.8},
-            
+            # Local LLMs (via Ollama)
+            {"provider": "local", "model": "mistral", "weight": 1.0},
+
             # Remote LLMs (fallback)
             {"provider": "remote", "model": "together", "weight": 0.7},
             {"provider": "remote", "model": "openrouter", "weight": 0.6},
@@ -50,21 +48,22 @@ class LLMOrchestrator:
             {"provider": "remote", "model": "openai", "weight": 0.3},
             {"provider": "remote", "model": "anthropic", "weight": 0.2}
         ]
-        
+
         # Task-specific model preferences
         self.task_preferences = {
-            'code_generation': ['ollama', 'together', 'openai'],
-            'code_fix': ['ollama', 'groq', 'together'],
+            'code_generation': ['mistral', 'together', 'openai'],
+            'code_fix': ['mistral', 'groq', 'together'],
             'code_review': ['openai', 'anthropic', 'together'],
-            'research': ['anthropic', 'openai', 'together'],
+            'research': ['mistral', 'groq', 'together'],
             'creative': ['openai', 'anthropic', 'together'],
             'analytical': ['openai', 'groq', 'together'],
-            'conversational': ['ollama', 'groq', 'together']
+            'conversational': ['mistral', 'groq', 'together']
         }
-        
+
         # Performance tracking
         self.performance_history = {}
         self.available_models = {}
+
     
     async def initialize(self):
         """Initialize LLM services"""
@@ -87,7 +86,10 @@ class LLMOrchestrator:
         task_type: str = "conversational",
         context: Optional[Dict[str, Any]] = None,
         max_models: int = 3,
-        require_consensus: bool = False
+        require_consensus: bool = False,
+        temperature=0.7,
+        provider='ollama',
+        model: Optional[str] = None  # <- ADD THIS
     ) -> Dict[str, Any]:
         """Generate response using multiple LLMs with intelligent merging"""
         
@@ -106,7 +108,7 @@ class LLMOrchestrator:
             
             if not responses:
                 raise Exception("No LLM responses generated")
-            
+            print(responses)
             # Merge responses intelligently
             merged_response = await self.response_merger.merge_responses(
                 responses, task_type, require_consensus

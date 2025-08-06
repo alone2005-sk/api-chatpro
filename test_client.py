@@ -1,46 +1,63 @@
-"""
-Test client for the AI Backend API
-"""
-
 import asyncio
 import aiohttp
-import json
+import jwt
+import time
+import logging
 
-async def test_api():
-    """Test the AI backend API"""
-    base_url = "http://localhost:8000/api/v1"
+# Configuration
+SECRET_KEY = "default_secret"  # Must match your backend's middleware secret
+API_URL = "http://localhost:5000"  # Adjust if hosted elsewhere
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("damn_bot_test_client")
+
+def generate_token():
+    payload = {
+        "user_id": "test_user",
+        "iat": int(time.time()),
+        "exp": int(time.time()) + 3600  # Valid for 1 hour
+    }
+    token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+    logger.info(f"Generated JWT token: {token}")
+    return token
+
+async def call_status(session):
+    logger.info("🔍 Checking /status endpoint...")
+    async with session.get(f"{API_URL}/status") as resp:
+        logger.info(f"Status code: {resp.status}")
+        result = await resp.text()
+        logger.info(f"Response: {result}")
+
+async def call_chat(session):
+    logger.info("💬 Sending /chat request...")
     
-    async with aiohttp.ClientSession() as session:
-        # Test system status
-        print("🔍 Checking system status...")
-        async with session.get(f"{base_url}/system/status") as response:
-            status = await response.json()
-            print(f"Status: {json.dumps(status, indent=2)}")
-        
-        # Test code generation
-        print("\n🧑‍💻 Testing code generation...")
-        request_data = {
-            "prompt": "Write a Python function to calculate fibonacci numbers",
-            "validate_code": True,
-            "save_output": True
-        }
-        
-        async with session.post(f"{base_url}/process", json=request_data) as response:
-            result = await response.json()
-            task_id = result["task_id"]
-            print(f"Task created: {task_id}")
-        
-        # Poll for completion
-        while True:
-            async with session.get(f"{base_url}/tasks/{task_id}") as response:
-                task_status = await response.json()
-                print(f"Status: {task_status['status']}, Progress: {task_status.get('progress', 0)}%")
-                
-                if task_status["status"] in ["completed", "failed"]:
-                    print(f"Final result: {json.dumps(task_status, indent=2)}")
-                    break
-                
-                await asyncio.sleep(2)
+    data = aiohttp.FormData()
+    data.add_field("prompt", "Create Me a full  web app for proejct for movie website ")
+    data.add_field("web_search", "false")
+    data.add_field("voice", "false")
+    data.add_field("stream", "false")
+    data.add_field("research_mode", "false")
+    data.add_field("deep_learning", "false")
+    data.add_field("code_execution", "true")
+    data.add_field("auto_fix", "true")
+    data.add_field("language", "en")
+    data.add_field("max_iterations", "3")
+    data.add_field("project_id", "test_project_123")
+
+    async with session.post(f"{API_URL}/chat", data=data) as resp:
+        logger.info(f"Status code: {resp.status}")
+        result = await resp.text()
+        logger.info(f"Response: {result}")
+
+async def main():
+    token = generate_token()
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+
+    async with aiohttp.ClientSession(headers=headers) as session:
+        await call_status(session)
+        await call_chat(session)
 
 if __name__ == "__main__":
-    asyncio.run(test_api())
+    asyncio.run(main())

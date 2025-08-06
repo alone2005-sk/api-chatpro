@@ -1,0 +1,34 @@
+2025-08-06 09:58:10,563 - middleware.security - INFO - SecurityMiddleware initialized with secret_key: default_secret
+2025-08-06 09:58:10,563 - main - INFO - 🚀 Starting DAMN BOT AI Chat Agent...
+2025-08-06 09:58:10,684 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-08-06 09:58:10,684 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-08-06 09:58:10,686 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 09:58:10,686 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 09:58:10,687 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 09:58:10,687 - services.local_llm_service - INFO - Local LLM service initialized
+2025-08-06 09:58:10,687 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-08-06 09:58:11,291 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 09:58:12,636 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 09:58:13,342 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 09:58:13,605 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 09:58:13,930 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 09:58:14,254 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 09:58:14,255 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-08-06 09:58:14,257 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-08-06 09:58:14,257 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-08-06 09:58:14,270 - main - INFO - ✅ DAMN BOT AI Chat Agent is ready!
+2025-08-06 09:58:45,478 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDc0MzI1LCJleHAiOjE3NTQ0Nzc5MjV9.zw1AcZAZ_TXRz18yvjTXwaZEoLCLfNDWA1wVI5FRPLY
+2025-08-06 09:58:45,480 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754474325, 'exp': 1754477925}
+2025-08-06 09:58:45,481 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 09:58:45,482 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 09:58:45,482 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 09:58:45,876 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 09:58:47,402 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 09:58:47,910 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 09:58:48,200 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 09:58:48,509 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 09:58:48,824 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 09:58:48,824 - main - ERROR - Health check error: 'ResearchService' object has no attribute 'health_check'
+2025-08-06 09:58:48,826 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDc0MzI1LCJleHAiOjE3NTQ0Nzc5MjV9.zw1AcZAZ_TXRz18yvjTXwaZEoLCLfNDWA1wVI5FRPLY
+2025-08-06 09:58:48,827 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754474325, 'exp': 1754477925}
+2025-08-06 09:59:40,563 - main - INFO - 🔄 Shutting down DAMN BOT...

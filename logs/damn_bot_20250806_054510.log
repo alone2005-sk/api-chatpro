@@ -1,0 +1,23 @@
+2025-08-06 05:45:10,026 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-08-06 05:45:10,026 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-08-06 05:45:10,026 - services.local_llm_service - WARNING - ❌ ollama is not available: localhost:11434/api/tags
+2025-08-06 05:45:10,026 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 05:45:10,027 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 05:45:10,027 - services.local_llm_service - INFO - Local LLM service initialized
+2025-08-06 05:45:10,027 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-08-06 05:45:10,931 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 05:45:12,792 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 05:45:13,153 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 05:45:13,414 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 05:45:13,794 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 05:45:14,137 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 05:45:14,137 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-08-06 05:45:14,137 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-08-06 05:45:14,137 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-08-06 05:45:14,349 - asyncio - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x7f07c15954c0>
+2025-08-06 05:45:14,349 - asyncio - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x7f07c17d9d60>
+2025-08-06 05:45:14,349 - asyncio - ERROR - Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x7f07c0efc6b0>, 1155.526193429)]', '[(<aiohttp.client_proto.ResponseHandler object at 0x7f07c0efcd10>, 1157.748851591)]', '[(<aiohttp.client_proto.ResponseHandler object at 0x7f07c0efce30>, 1158.009393902)]', '[(<aiohttp.client_proto.ResponseHandler object at 0x7f07c0efd2b0>, 1158.389829465)]', '[(<aiohttp.client_proto.ResponseHandler object at 0x7f07c0efd4f0>, 1158.732374634)]']
+connector: <aiohttp.connector.TCPConnector object at 0x7f07c1546870>

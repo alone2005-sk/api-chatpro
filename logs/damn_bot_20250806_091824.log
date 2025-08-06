@@ -1,0 +1,65 @@
+2025-08-06 09:18:24,436 - middleware.security - INFO - SecurityMiddleware initialized with secret_key: default_secret
+2025-08-06 09:18:24,436 - main - INFO - 🚀 Starting DAMN BOT AI Chat Agent...
+2025-08-06 09:18:24,452 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-08-06 09:18:24,453 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-08-06 09:18:24,456 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 09:18:24,456 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 09:18:24,545 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 09:18:24,545 - services.local_llm_service - INFO - Local LLM service initialized
+2025-08-06 09:18:24,545 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-08-06 09:18:24,994 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 09:18:26,779 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 09:18:27,113 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 09:18:27,397 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 09:18:27,664 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 09:18:27,989 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 09:18:27,990 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-08-06 09:18:27,991 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-08-06 09:18:27,991 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-08-06 09:18:28,004 - main - INFO - ✅ DAMN BOT AI Chat Agent is ready!
+2025-08-06 09:18:33,662 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDcxOTEzLCJleHAiOjE3NTQ0NzU1MTN9.sKzEhVwxptfjY6-VRyVGx9hn1DDDgwwkzBt_gfD_cP8
+2025-08-06 09:18:33,662 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754471913, 'exp': 1754475513}
+2025-08-06 09:18:33,664 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 09:18:33,664 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 09:18:33,664 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 09:18:34,558 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 09:18:36,469 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 09:18:36,776 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 09:18:37,038 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 09:18:37,384 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 09:18:37,687 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 09:18:37,688 - main - ERROR - Health check error: 'ResearchService' object has no attribute 'health_check'
+2025-08-06 09:18:37,690 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDcxOTEzLCJleHAiOjE3NTQ0NzU1MTN9.sKzEhVwxptfjY6-VRyVGx9hn1DDDgwwkzBt_gfD_cP8
+2025-08-06 09:18:37,690 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754471913, 'exp': 1754475513}
+2025-08-06 09:18:37,708 - services.chat_service - INFO - Processing chat request for project test_project_123
+2025-08-06 09:18:37,712 - services.chat_service - INFO - Detected task: TaskType.GENERAL_CHAT (confidence: 0.5)
+2025-08-06 09:18:37,712 - services.chat_service - INFO - Enabling research mode
+2025-08-06 09:18:37,713 - services.research_service - INFO - Starting research on topic: What time is it in Tokyo right now?
+2025-08-06 09:18:38,134 - services.llm_orchestrator - INFO - Generating response with models: ['anthropic', 'openai', 'together']
+2025-08-06 09:18:38,416 - services.remote_llm_service - ERROR - Remote LLM generation error (openai): OpenAI API error: 401 - {
+    "error": {
+        "message": "Incorrect API key provided: your_ope********here. You can find your API key at https://platform.openai.com/account/api-keys.",
+        "type": "invalid_request_error",
+        "param": null,
+        "code": "invalid_api_key"
+    }
+}
+
+2025-08-06 09:18:38,416 - services.llm_orchestrator - ERROR - Remote LLM error (openai): OpenAI API error: 401 - {
+    "error": {
+        "message": "Incorrect API key provided: your_ope********here. You can find your API key at https://platform.openai.com/account/api-keys.",
+        "type": "invalid_request_error",
+        "param": null,
+        "code": "invalid_api_key"
+    }
+}
+
+2025-08-06 09:18:38,457 - services.remote_llm_service - ERROR - Remote LLM generation error (anthropic): Anthropic API error: 401 - {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"}}
+2025-08-06 09:18:38,457 - services.llm_orchestrator - ERROR - Remote LLM error (anthropic): Anthropic API error: 401 - {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"}}
+2025-08-06 09:18:39,951 - services.research_service - WARNING - Failed to parse JSON response: Expecting value: line 1 column 1 (char 0)
+2025-08-06 09:18:39,952 - services.research_service - ERROR - Summary generation failed: LLMOrchestrator.generate_response() got an unexpected keyword argument 'model'
+2025-08-06 09:18:39,952 - services.research_service - INFO - Research completed for topic: What time is it in Tokyo right now?
+2025-08-06 09:18:39,952 - services.chat_service - INFO - Generating response with multi-LLM orchestration
+2025-08-06 09:18:39,952 - services.llm_orchestrator - INFO - Generating response with models: ['together', 'openrouter', 'groq']
+2025-08-06 09:18:41,266 - services.chat_service - INFO - Chat processing completed in 3.57s
+2025-08-06 09:18:41,267 - services.chat_service - INFO - Cleanup completed for project test_project_123

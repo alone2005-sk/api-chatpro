@@ -1,0 +1,4 @@
+2025-08-06 06:53:12,479 - middleware.security - INFO - SecurityMiddleware initialized with secret_key: default_secret
+2025-08-06 06:53:12,480 - main - INFO - 🚀 Starting DAMN BOT AI Chat Agent...
+2025-08-06 06:53:12,583 - main - ERROR - ❌ Failed to initialize DAMN BOT: (sqlite3.OperationalError) unable to open database file
+(Background on this error at: https://sqlalche.me/e/20/e3q8)

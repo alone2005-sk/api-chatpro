@@ -1,5 +1,5 @@
 """
-Request and response models for DAMN BOT
+Request and response models for DAMN BOT AI System
 """
 
 from pydantic import BaseModel, Field
@@ -28,34 +28,32 @@ class CodeExecutionRequest(BaseModel):
 
 class ChatRequest(BaseModel):
     """Chat request model"""
-    prompt: str = Field(..., description="User prompt")
+    prompt: str = Field(..., description="User prompt/question")
     files: List[UploadFile] = Field(default=[], description="Uploaded files")
-    web_search: bool = Field(default=False, description="Enable web search")
-    voice: bool = Field(default=False, description="Generate voice output")
-    project_id: Optional[str] = Field(default=None, description="Project session ID")
-    stream: bool = Field(default=False, description="Enable streaming response")
-    research_mode: bool = Field(default=False, description="Enable deep research mode")
-    deep_learning: bool = Field(default=False, description="Enable deep learning features")
-    code_execution: bool = Field(default=True, description="Enable code execution")
-    auto_fix: bool = Field(default=True, description="Auto-fix code errors")
-    language: str = Field(default="auto", description="Programming language preference")
-    max_iterations: int = Field(default=3, description="Max iterations for auto-fix")
+    project_id: Optional[str] = Field(None, description="Project ID for conversation continuity")
+    web_search: bool = Field(False, description="Enable web search")
+    voice: bool = Field(False, description="Generate voice response")
+    research_mode: bool = Field(False, description="Enable deep research mode")
+    deep_learning: bool = Field(False, description="Enable deep learning processing")
+    code_execution: bool = Field(False, description="Enable code execution")
+    auto_fix: bool = Field(False, description="Auto-fix code errors")
+    max_iterations: int = Field(3, description="Maximum auto-fix iterations")
     
     class Config:
         arbitrary_types_allowed = True
 
 class ChatResponse(BaseModel):
     """Chat response model"""
-    project_id: str = Field(..., description="Project session ID")
+    project_id: str = Field(..., description="Project ID")
     message_id: str = Field(..., description="Message ID")
-    text: str = Field(..., description="Response text")
-    code: Optional[str] = Field(default=None, description="Generated code")
-    language: Optional[str] = Field(default=None, description="Code language")
-    files: List[str] = Field(default=[], description="Generated file paths")
-    audio_file: Optional[str] = Field(default=None, description="Generated audio file path")
+    text: str = Field(..., description="AI response text")
+    code: Optional[str] = Field(None, description="Generated code")
+    language: Optional[str] = Field(None, description="Programming language")
+    files: List[Dict[str, Any]] = Field(default=[], description="Generated files")
+    audio_file: Optional[str] = Field(None, description="Generated audio file path")
     sources: List[Dict[str, Any]] = Field(default=[], description="Web search sources")
-    research_data: Optional[Dict[str, Any]] = Field(default=None, description="Research results")
-    execution_results: Optional[Dict[str, Any]] = Field(default=None, description="Code execution results")
+    research_data: Optional[Dict[str, Any]] = Field(None, description="Research findings")
+    execution_results: Optional[Dict[str, Any]] = Field(None, description="Code execution results")
     llm_scores: Dict[str, float] = Field(default={}, description="LLM performance scores")
     processing_time: float = Field(..., description="Processing time in seconds")
     metadata: Dict[str, Any] = Field(default={}, description="Additional metadata")
@@ -68,29 +66,42 @@ class FileAnalysis(BaseModel):
     content: str
     metadata: Dict[str, Any] = Field(default={})
     analysis_time: float
+    ocr_results: Optional[Dict[str, Any]] = Field(default=None)
+    object_detection: Optional[Dict[str, Any]] = Field(default=None)
+    transcription: Optional[Dict[str, Any]] = Field(default=None)
+
+class FileProcessResult(BaseModel):
+    """File processing result"""
+    filename: str
+    file_type: str
+    size: int
+    content: str
+    metadata: Dict[str, Any] = {}
+    processing_time: float
+    success: bool
+    error: Optional[str] = None
+
+class CodeExecutionResult(BaseModel):
+    """Code execution result"""
+    success: bool
+    output: str
+    error: Optional[str] = None
+    execution_time: float
+    language: str
+    code: str
 
 class WebSearchResult(BaseModel):
     """Web search result"""
     query: str
-    sources: List[Dict[str, Any]]
+    results: List[Dict[str, Any]]
     summary: str
-    timestamp: str
+    sources: List[Dict[str, Any]]
+    search_time: float
 
-class VoiceGeneration(BaseModel):
+class VoiceGenerationResult(BaseModel):
     """Voice generation result"""
-    text: str
     audio_file: str
-    engine: str
     duration: float
-    metadata: Dict[str, Any] = Field(default={})
-
-class CodeExecution(BaseModel):
-    """Code execution result"""
-    code: str
-    language: str
-    output: str
-    error: Optional[str] = None
-    exit_code: int
-    execution_time: float
-    success: bool
-    iterations: int = 1
+    voice_model: str
+    text: str
+    generation_time: float

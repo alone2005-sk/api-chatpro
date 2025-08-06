@@ -1,0 +1,39 @@
+2025-08-06 06:55:52,198 - middleware.security - INFO - SecurityMiddleware initialized with secret_key: default_secret
+2025-08-06 06:55:52,198 - main - INFO - 🚀 Starting DAMN BOT AI Chat Agent...
+2025-08-06 06:55:52,215 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-08-06 06:55:52,215 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-08-06 06:55:52,217 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 06:55:52,217 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 06:55:52,308 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 06:55:52,308 - services.local_llm_service - INFO - Local LLM service initialized
+2025-08-06 06:55:52,308 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-08-06 06:55:53,294 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 06:55:54,875 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 06:55:56,869 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 06:55:57,142 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 06:55:57,430 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 06:55:57,784 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 06:55:57,784 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-08-06 06:55:57,786 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-08-06 06:55:57,786 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-08-06 06:55:57,799 - main - INFO - ✅ DAMN BOT AI Chat Agent is ready!
+2025-08-06 06:55:57,803 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDYzMzU1LCJleHAiOjE3NTQ0NjY5NTV9.y5tnC91y2FEYuy55QLJdboW71iT78dKQsFje10UnHAY
+2025-08-06 06:55:57,803 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754463355, 'exp': 1754466955}
+2025-08-06 06:55:57,805 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 06:55:57,805 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 06:55:57,805 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 06:55:58,181 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 06:55:59,344 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 06:55:59,648 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 06:55:59,904 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 06:56:00,221 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 06:56:00,522 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 06:56:00,525 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDYzMzU1LCJleHAiOjE3NTQ0NjY5NTV9.y5tnC91y2FEYuy55QLJdboW71iT78dKQsFje10UnHAY
+2025-08-06 06:56:00,525 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754463355, 'exp': 1754466955}
+2025-08-06 06:56:00,541 - services.chat_service - INFO - Processing chat request for project test_project_123
+2025-08-06 06:56:00,546 - services.chat_service - INFO - Detected task: TaskType.GENERAL_CHAT (confidence: 0.5)
+2025-08-06 06:56:00,546 - services.chat_service - INFO - Generating response with multi-LLM orchestration
+2025-08-06 06:56:00,546 - services.llm_orchestrator - INFO - Generating response with models: ['together', 'openrouter', 'groq']
+2025-08-06 06:56:02,255 - services.chat_service - ERROR - Chat processing error: 'TaskInfo' object is not subscriptable
+2025-08-06 06:56:02,255 - main - ERROR - Chat endpoint error: 'TaskInfo' object is not subscriptable
+2025-08-06 06:57:18,090 - main - INFO - 🔄 Shutting down DAMN BOT...

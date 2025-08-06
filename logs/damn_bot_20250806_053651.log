@@ -1,0 +1,46 @@
+2025-08-06 05:36:51,161 - middleware.security - INFO - SecurityMiddleware initialized with secret_key: default_secret
+2025-08-06 05:36:51,162 - main - INFO - 🚀 Starting DAMN BOT AI Chat Agent...
+2025-08-06 05:36:51,279 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-08-06 05:36:51,279 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-08-06 05:36:51,279 - services.local_llm_service - WARNING - ❌ ollama is not available: localhost:11434/api/tags
+2025-08-06 05:36:51,279 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 05:36:51,280 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 05:36:51,280 - services.local_llm_service - INFO - Local LLM service initialized
+2025-08-06 05:36:51,280 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-08-06 05:36:52,133 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 05:36:53,620 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 05:36:53,975 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 05:36:54,230 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 05:36:54,569 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 05:36:54,896 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 05:36:54,896 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-08-06 05:36:54,896 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-08-06 05:36:54,896 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-08-06 05:36:54,915 - main - INFO - ✅ DAMN BOT AI Chat Agent is ready!
+2025-08-06 05:36:54,921 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDU4NjEyLCJleHAiOjE3NTQ0NjIyMTJ9.Ga-RsnRDbPsBfwsVJNyZfahHBvieJMVXJh9JE8Ide8g
+2025-08-06 05:36:54,922 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754458612, 'exp': 1754462212}
+2025-08-06 05:36:54,922 - services.local_llm_service - WARNING - ❌ ollama is not available: localhost:11434/api/tags
+2025-08-06 05:36:54,923 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 05:36:54,923 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 05:36:55,514 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 05:36:56,700 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 05:36:57,017 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 05:36:57,262 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 05:36:57,573 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 05:36:57,893 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 05:36:57,895 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDU4NjEyLCJleHAiOjE3NTQ0NjIyMTJ9.Ga-RsnRDbPsBfwsVJNyZfahHBvieJMVXJh9JE8Ide8g
+2025-08-06 05:36:57,896 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754458612, 'exp': 1754462212}
+2025-08-06 05:36:57,897 - services.chat_service - ERROR - Chat processing error: 'coroutine' object does not support the asynchronous context manager protocol
+2025-08-06 05:36:57,897 - main - ERROR - Chat endpoint error: 'coroutine' object does not support the asynchronous context manager protocol
+2025-08-06 05:36:57,898 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDU4NjEyLCJleHAiOjE3NTQ0NjIyMTJ9.Ga-RsnRDbPsBfwsVJNyZfahHBvieJMVXJh9JE8Ide8g
+2025-08-06 05:36:57,899 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754458612, 'exp': 1754462212}
+2025-08-06 05:36:57,899 - main - ERROR - Project history error: 'coroutine' object does not support the asynchronous context manager protocol
+2025-08-06 05:36:57,901 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDU4NjEyLCJleHAiOjE3NTQ0NjIyMTJ9.Ga-RsnRDbPsBfwsVJNyZfahHBvieJMVXJh9JE8Ide8g
+2025-08-06 05:36:57,902 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754458612, 'exp': 1754462212}
+2025-08-06 05:36:57,902 - main - ERROR - Download error: Project example_project_id not found
+2025-08-06 05:36:57,904 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDU4NjEyLCJleHAiOjE3NTQ0NjIyMTJ9.Ga-RsnRDbPsBfwsVJNyZfahHBvieJMVXJh9JE8Ide8g
+2025-08-06 05:36:57,904 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754458612, 'exp': 1754462212}
+2025-08-06 05:36:57,904 - main - ERROR - Metrics error: 'coroutine' object does not support the asynchronous context manager protocol
+2025-08-06 05:36:57,907 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDU4NjEyLCJleHAiOjE3NTQ0NjIyMTJ9.Ga-RsnRDbPsBfwsVJNyZfahHBvieJMVXJh9JE8Ide8g
+2025-08-06 05:36:57,908 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754458612, 'exp': 1754462212}
+2025-08-06 05:38:36,760 - main - INFO - 🔄 Shutting down DAMN BOT...

@@ -1,0 +1,39 @@
+2025-08-06 06:57:26,316 - middleware.security - INFO - SecurityMiddleware initialized with secret_key: default_secret
+2025-08-06 06:57:26,317 - main - INFO - 🚀 Starting DAMN BOT AI Chat Agent...
+2025-08-06 06:57:26,333 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-08-06 06:57:26,333 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-08-06 06:57:26,335 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 06:57:26,335 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 06:57:26,424 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 06:57:26,424 - services.local_llm_service - INFO - Local LLM service initialized
+2025-08-06 06:57:26,424 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-08-06 06:57:26,852 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 06:57:28,505 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 06:57:29,058 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 06:57:29,321 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 06:57:29,656 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 06:57:29,982 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 06:57:29,982 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-08-06 06:57:29,984 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-08-06 06:57:29,984 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-08-06 06:57:30,018 - main - INFO - ✅ DAMN BOT AI Chat Agent is ready!
+2025-08-06 06:57:30,024 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDYzNDQ0LCJleHAiOjE3NTQ0NjcwNDR9.OixFndbv7FJUGzuBke2AlR6uZJKWtLwMWYhG6msvRO8
+2025-08-06 06:57:30,024 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754463444, 'exp': 1754467044}
+2025-08-06 06:57:30,027 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 06:57:30,028 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 06:57:30,028 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 06:57:30,396 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 06:57:31,766 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 06:57:32,089 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 06:57:32,345 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 06:57:32,646 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 06:57:32,946 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 06:57:32,949 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDYzNDQ0LCJleHAiOjE3NTQ0NjcwNDR9.OixFndbv7FJUGzuBke2AlR6uZJKWtLwMWYhG6msvRO8
+2025-08-06 06:57:32,949 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754463444, 'exp': 1754467044}
+2025-08-06 06:57:32,966 - services.chat_service - INFO - Processing chat request for project test_project_123
+2025-08-06 06:57:32,970 - services.chat_service - INFO - Detected task: TaskType.GENERAL_CHAT (confidence: 0.5)
+2025-08-06 06:57:32,970 - services.chat_service - INFO - Generating response with multi-LLM orchestration
+2025-08-06 06:57:32,971 - services.llm_orchestrator - INFO - Generating response with models: ['together', 'openrouter', 'groq']
+2025-08-06 06:57:35,221 - services.chat_service - INFO - Chat processing completed in 2.27s
+2025-08-06 06:57:35,222 - services.chat_service - INFO - Cleanup completed for project test_project_123
+2025-08-06 06:58:18,185 - main - INFO - 🔄 Shutting down DAMN BOT...

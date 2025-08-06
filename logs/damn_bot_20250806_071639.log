@@ -1,0 +1,39 @@
+2025-08-06 07:16:39,738 - middleware.security - INFO - SecurityMiddleware initialized with secret_key: default_secret
+2025-08-06 07:16:39,738 - main - INFO - 🚀 Starting DAMN BOT AI Chat Agent...
+2025-08-06 07:16:39,759 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-08-06 07:16:39,759 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-08-06 07:16:39,762 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 07:16:39,762 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 07:16:39,879 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 07:16:39,879 - services.local_llm_service - INFO - Local LLM service initialized
+2025-08-06 07:16:39,879 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-08-06 07:16:40,296 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 07:16:41,788 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 07:16:42,858 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 07:16:43,141 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 07:16:43,450 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 07:16:43,765 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 07:16:43,765 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-08-06 07:16:43,767 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-08-06 07:16:43,767 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-08-06 07:16:43,780 - main - INFO - ✅ DAMN BOT AI Chat Agent is ready!
+2025-08-06 07:16:43,785 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDY0NjAxLCJleHAiOjE3NTQ0NjgyMDF9.6cynHCMISkbABePwXxd1M0NQuZocTvEDln70unK1jeA
+2025-08-06 07:16:43,785 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754464601, 'exp': 1754468201}
+2025-08-06 07:16:43,787 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 07:16:43,788 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 07:16:43,788 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 07:16:44,254 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 07:16:45,848 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 07:16:46,175 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 07:16:46,440 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 07:16:46,723 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 07:16:47,043 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 07:16:47,046 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDY0NjAxLCJleHAiOjE3NTQ0NjgyMDF9.6cynHCMISkbABePwXxd1M0NQuZocTvEDln70unK1jeA
+2025-08-06 07:16:47,046 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754464601, 'exp': 1754468201}
+2025-08-06 07:16:47,064 - services.chat_service - INFO - Processing chat request for project test_project_123
+2025-08-06 07:16:47,068 - services.chat_service - INFO - Detected task: TaskType.GENERAL_CHAT (confidence: 0.5)
+2025-08-06 07:16:47,068 - services.chat_service - INFO - Performing web search
+2025-08-06 07:16:47,247 - services.web_search - ERROR - DuckDuckGo search failed: 0, message='Attempt to decode JSON with unexpected mimetype: application/x-javascript', url=URL('https://api.duckduckgo.com/?q=Tell+me+about+the+latest+open-source+AI+models.&format=json&no_html=1&skip_disambig=1')
+2025-08-06 07:16:47,247 - services.chat_service - ERROR - Chat processing error: 'summary'
+2025-08-06 07:16:47,247 - main - ERROR - Chat endpoint error: 'summary'
+2025-08-06 07:18:47,999 - main - INFO - 🔄 Shutting down DAMN BOT...

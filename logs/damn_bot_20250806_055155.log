@@ -1,0 +1,19 @@
+2025-08-06 05:51:55,362 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-08-06 05:51:55,363 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-08-06 05:51:55,363 - services.local_llm_service - WARNING - ❌ ollama is not available: localhost:11434/api/tags
+2025-08-06 05:51:55,363 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 05:51:55,363 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 05:51:55,364 - services.local_llm_service - INFO - Local LLM service initialized
+2025-08-06 05:51:55,364 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-08-06 05:51:55,740 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 05:51:57,083 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 05:51:57,644 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 05:51:57,921 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 05:51:58,265 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 05:51:58,613 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 05:51:58,613 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-08-06 05:51:58,613 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-08-06 05:51:58,614 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-08-06 05:51:58,646 - services.chat_service - INFO - Processing chat request for project test_project_123
+2025-08-06 05:51:58,646 - services.chat_service - ERROR - Chat processing error: 'TaskDetector' object has no attribute 'detect_task'
+2025-08-06 05:51:58,646 - main - ERROR - Chat endpoint error: 'TaskDetector' object has no attribute 'detect_task'

@@ -1,0 +1,64 @@
+2025-08-06 06:49:28,066 - middleware.security - INFO - SecurityMiddleware initialized with secret_key: default_secret
+2025-08-06 06:49:28,066 - main - INFO - 🚀 Starting DAMN BOT AI Chat Agent...
+2025-08-06 06:49:28,172 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-08-06 06:49:28,172 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-08-06 06:49:28,174 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 06:49:28,174 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 06:49:28,174 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 06:49:28,175 - services.local_llm_service - INFO - Local LLM service initialized
+2025-08-06 06:49:28,175 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-08-06 06:49:28,633 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 06:49:30,032 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 06:49:30,348 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 06:49:30,623 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 06:49:30,978 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 06:49:31,295 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 06:49:31,295 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-08-06 06:49:31,297 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-08-06 06:49:31,297 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-08-06 06:49:31,311 - main - INFO - ✅ DAMN BOT AI Chat Agent is ready!
+2025-08-06 06:49:31,315 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDYyOTY0LCJleHAiOjE3NTQ0NjY1NjR9.EBzbdv_DMxWwbI_6hHgDA1ZSv6OpOqiITh0fp0E0_1E
+2025-08-06 06:49:31,316 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754462964, 'exp': 1754466564}
+2025-08-06 06:49:31,317 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 06:49:31,317 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 06:49:31,318 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 06:49:31,865 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 06:49:33,334 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 06:49:33,643 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 06:49:33,882 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 06:49:34,185 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 06:49:34,480 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 06:49:34,482 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDYyOTY0LCJleHAiOjE3NTQ0NjY1NjR9.EBzbdv_DMxWwbI_6hHgDA1ZSv6OpOqiITh0fp0E0_1E
+2025-08-06 06:49:34,482 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754462964, 'exp': 1754466564}
+2025-08-06 06:49:34,498 - services.chat_service - INFO - Processing chat request for project test_project_123
+2025-08-06 06:49:34,503 - services.chat_service - INFO - Detected task: TaskType.GENERAL_CHAT (confidence: 0.5)
+2025-08-06 06:49:34,503 - services.chat_service - INFO - Generating response with multi-LLM orchestration
+2025-08-06 06:49:34,503 - services.llm_orchestrator - INFO - Generating response with models: ['together', 'openrouter', 'groq']
+2025-08-06 06:49:36,088 - services.chat_service - ERROR - Chat processing error: greenlet_spawn has not been called; can't call await_only() here. Was IO attempted in an unexpected place? (Background on this error at: https://sqlalche.me/e/20/xd2s)
+2025-08-06 06:49:36,088 - main - ERROR - Chat endpoint error: greenlet_spawn has not been called; can't call await_only() here. Was IO attempted in an unexpected place? (Background on this error at: https://sqlalche.me/e/20/xd2s)
+2025-08-06 06:51:09,238 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDYzMDY5LCJleHAiOjE3NTQ0NjY2Njl9.qK7VFl59nrHjQtaHbl-utMqLGjVP112NSwkYe2WcqB4
+2025-08-06 06:51:09,239 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754463069, 'exp': 1754466669}
+2025-08-06 06:51:09,241 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 06:51:09,241 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 06:51:09,241 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 06:51:09,637 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 06:51:10,974 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 06:51:11,300 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 06:51:11,597 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 06:51:11,919 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 06:51:12,237 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 06:51:12,239 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDYzMDY5LCJleHAiOjE3NTQ0NjY2Njl9.qK7VFl59nrHjQtaHbl-utMqLGjVP112NSwkYe2WcqB4
+2025-08-06 06:51:12,239 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754463069, 'exp': 1754466669}
+2025-08-06 06:51:12,242 - services.chat_service - INFO - Processing chat request for project test_project_123
+2025-08-06 06:51:12,242 - services.chat_service - INFO - Detected task: TaskType.GENERAL_CHAT (confidence: 0.5)
+2025-08-06 06:51:12,242 - services.chat_service - INFO - Generating response with multi-LLM orchestration
+2025-08-06 06:51:12,242 - services.llm_orchestrator - INFO - Generating response with models: ['together', 'openrouter', 'groq']
+2025-08-06 06:51:13,936 - services.chat_service - ERROR - Chat processing error: (sqlite3.OperationalError) attempt to write a readonly database
+[SQL: INSERT INTO messages (id, project_id, role, content, timestamp, message_type, meta) VALUES (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('78c80a7e-620a-4f89-9b06-e1a93667b3ab', 'test_project_123', 'user', 'Tell me a joke about AI and ML', '2025-08-06 06:51:13.933658', 'text', '{}', 'faec5073-7b56-404d-b729-1ccb496841ee', 'test_project_123', 'assistant', 'Why did the AI model go to therapy?\n\nBecause it was struggling to "train" its emotions and was feeling "overfit"!\n\n(Sorry, it\'s a bit of a "machine learning" pun, but I hope it brings a smile to your face!)', '2025-08-06 06:51:13.933799', 'text', '{}')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-08-06 06:51:13,936 - main - ERROR - Chat endpoint error: (sqlite3.OperationalError) attempt to write a readonly database
+[SQL: INSERT INTO messages (id, project_id, role, content, timestamp, message_type, meta) VALUES (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('78c80a7e-620a-4f89-9b06-e1a93667b3ab', 'test_project_123', 'user', 'Tell me a joke about AI and ML', '2025-08-06 06:51:13.933658', 'text', '{}', 'faec5073-7b56-404d-b729-1ccb496841ee', 'test_project_123', 'assistant', 'Why did the AI model go to therapy?\n\nBecause it was struggling to "train" its emotions and was feeling "overfit"!\n\n(Sorry, it\'s a bit of a "machine learning" pun, but I hope it brings a smile to your face!)', '2025-08-06 06:51:13.933799', 'text', '{}')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-08-06 06:52:22,784 - main - INFO - 🔄 Shutting down DAMN BOT...

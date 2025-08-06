@@ -1,0 +1,18 @@
+2025-07-26 11:44:28,230 - main - INFO - 🚀 Starting DAMN BOT AI Chat Agent...
+2025-07-26 11:44:28,245 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-07-26 11:44:28,245 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-07-26 11:44:28,246 - services.local_llm_service - WARNING - ❌ ollama is not available: localhost:11434/api/tags
+2025-07-26 11:44:28,246 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-07-26 11:44:28,246 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-07-26 11:44:28,246 - services.local_llm_service - INFO - Local LLM service initialized
+2025-07-26 11:44:28,246 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-07-26 11:44:28,925 - services.remote_llm_service - INFO - ✅ together is available
+2025-07-26 11:44:29,778 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-07-26 11:44:30,327 - services.remote_llm_service - INFO - ✅ groq is available
+2025-07-26 11:44:30,598 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-07-26 11:44:30,940 - services.remote_llm_service - INFO - ✅ openai is available
+2025-07-26 11:44:31,257 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-07-26 11:44:31,258 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-07-26 11:44:31,258 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-07-26 11:44:31,258 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-07-26 11:44:31,260 - main - ERROR - ❌ Failed to initialize DAMN BOT: VoiceService.__init__() takes 1 positional argument but 2 were given

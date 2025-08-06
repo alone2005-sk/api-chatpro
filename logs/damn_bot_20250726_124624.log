@@ -1,0 +1,35 @@
+2025-07-26 12:46:24,552 - middleware.security - INFO - SecurityMiddleware initialized with secret_key: default_secret
+2025-07-26 12:46:24,552 - main - INFO - 🚀 Starting DAMN BOT AI Chat Agent...
+2025-07-26 12:46:24,579 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-07-26 12:46:24,580 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-07-26 12:46:24,580 - services.local_llm_service - WARNING - ❌ ollama is not available: localhost:11434/api/tags
+2025-07-26 12:46:24,581 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-07-26 12:46:24,581 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-07-26 12:46:24,581 - services.local_llm_service - INFO - Local LLM service initialized
+2025-07-26 12:46:24,582 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-07-26 12:46:25,301 - services.remote_llm_service - INFO - ✅ together is available
+2025-07-26 12:46:26,615 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-07-26 12:46:26,967 - services.remote_llm_service - INFO - ✅ groq is available
+2025-07-26 12:46:27,236 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-07-26 12:46:27,539 - services.remote_llm_service - INFO - ✅ openai is available
+2025-07-26 12:46:27,864 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-07-26 12:46:27,865 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-07-26 12:46:27,865 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-07-26 12:46:27,865 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-07-26 12:46:27,973 - main - INFO - ✅ DAMN BOT AI Chat Agent is ready!
+2025-07-26 12:46:33,994 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzUzNTMzOTkzLCJleHAiOjE3NTM1Mzc1OTN9.6yUZ-3HIKc7CT4fPoLNOQrn2uhdKBRSh4tljljbI2vg
+2025-07-26 12:46:33,994 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1753533993, 'exp': 1753537593}
+2025-07-26 12:46:33,995 - services.local_llm_service - WARNING - ❌ ollama is not available: localhost:11434/api/tags
+2025-07-26 12:46:33,995 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-07-26 12:46:33,995 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-07-26 12:46:34,340 - services.remote_llm_service - INFO - ✅ together is available
+2025-07-26 12:46:35,393 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-07-26 12:46:35,694 - services.remote_llm_service - INFO - ✅ groq is available
+2025-07-26 12:46:35,943 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-07-26 12:46:36,247 - services.remote_llm_service - INFO - ✅ openai is available
+2025-07-26 12:46:36,562 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-07-26 12:46:45,245 - middleware.security - ERROR - Missing Authorization header
+2025-07-26 12:46:45,245 - middleware.security - ERROR - Security verification failed: 
+2025-07-26 12:46:45,764 - middleware.security - ERROR - Missing Authorization header
+2025-07-26 12:46:45,764 - middleware.security - ERROR - Security verification failed: 
+2025-07-26 12:51:26,033 - main - INFO - 🔄 Shutting down DAMN BOT...

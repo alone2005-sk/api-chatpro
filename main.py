@@ -30,7 +30,8 @@ from services.research_service import ResearchService
 from services.deep_learning_service import DeepLearningService
 from models.requests import ChatRequest, ChatResponse
 from middleware.security import SecurityMiddleware
-from middleware.rate_limiter import RateLimiter
+from middleware.rate_limiter import RateLimitMiddleware
+
 
 # Initialize settings and logging
 settings = Settings()
@@ -74,14 +75,18 @@ async def lifespan(app: FastAPI):
         voice_service = VoiceService(settings)
         await voice_service.initialize()
         
-        code_service = CodeService(settings)
-        await code_service.initialize()
+        # code_service = CodeService(settings)
+        # await code_service.initialize()
         
-        research_service = ResearchService(settings, web_search_service, llm_orchestrator)
-        await research_service.initialize()
+        research_service = ResearchService(
+    settings=settings,
+    web_search_service=web_search_service,
+    llm_orchestrator=llm_orchestrator
+          )
+        #await research_service.initialize()
         
-        deep_learning_service = DeepLearningService(settings)
-        await deep_learning_service.initialize()
+        # deep_learning_service = DeepLearningService(settings)
+        # await deep_learning_service.initialize()
         
         chat_service = ChatService(
             db_manager=db_manager,
@@ -137,7 +142,8 @@ app.add_middleware(
 )
 
 app.add_middleware(SecurityMiddleware)
-app.add_middleware(RateLimiter, calls=settings.RATE_LIMIT_CALLS, period=settings.RATE_LIMIT_PERIOD)
+app.add_middleware(RateLimitMiddleware, max_requests=settings.RATE_LIMIT_CALLS, window_seconds=settings.RATE_LIMIT_PERIOD)
+
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -295,7 +301,7 @@ async def get_available_models():
         return JSONResponse(models)
     except Exception as e:
         logger.error(f"Models error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=5000, detail=str(e))
 
 if __name__ == "__main__":
     uvicorn.run(

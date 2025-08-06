@@ -1,0 +1,18 @@
+2025-08-06 05:49:57,574 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-08-06 05:49:57,574 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-08-06 05:49:57,575 - services.local_llm_service - WARNING - ❌ ollama is not available: localhost:11434/api/tags
+2025-08-06 05:49:57,575 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 05:49:57,575 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 05:49:57,575 - services.local_llm_service - INFO - Local LLM service initialized
+2025-08-06 05:49:57,575 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-08-06 05:49:58,269 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 05:49:59,816 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 05:50:00,168 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 05:50:00,440 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 05:50:00,761 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 05:50:01,077 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 05:50:01,077 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-08-06 05:50:01,077 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-08-06 05:50:01,077 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-08-06 05:50:01,090 - services.chat_service - ERROR - Chat processing error: 'coroutine' object does not support the asynchronous context manager protocol
+2025-08-06 05:50:01,090 - main - ERROR - Chat endpoint error: 'coroutine' object does not support the asynchronous context manager protocol

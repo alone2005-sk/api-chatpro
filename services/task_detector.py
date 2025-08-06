@@ -364,3 +364,6 @@ class TaskDetector:
             "supported_frameworks": list(self.framework_patterns.keys()),
             "status": "ready"
         }
+    async def detect_task(self, prompt: str, context: Dict = None) -> TaskInfo:
+        """Alias for analyze_intent for backward compatibility"""
+        return await self.analyze_intent(prompt, context)

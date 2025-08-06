@@ -1,0 +1,50 @@
+2025-08-06 10:03:54,644 - middleware.security - INFO - SecurityMiddleware initialized with secret_key: default_secret
+2025-08-06 10:03:54,645 - main - INFO - 🚀 Starting DAMN BOT AI Chat Agent...
+2025-08-06 10:03:54,757 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-08-06 10:03:54,757 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-08-06 10:03:54,760 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 10:03:54,760 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 10:03:54,760 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 10:03:54,761 - services.local_llm_service - INFO - Local LLM service initialized
+2025-08-06 10:03:54,761 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-08-06 10:03:55,505 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 10:03:56,937 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 10:03:57,711 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 10:03:57,978 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 10:03:58,273 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 10:03:58,581 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 10:03:58,581 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-08-06 10:03:58,583 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-08-06 10:03:58,583 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-08-06 10:03:58,596 - main - INFO - ✅ DAMN BOT AI Chat Agent is ready!
+2025-08-06 10:03:58,599 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDc0NjMzLCJleHAiOjE3NTQ0NzgyMzN9.erpQ6AokHunT6Y2p-i4OB7af0dlZU-MrKhqlh037nio
+2025-08-06 10:03:58,600 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754474633, 'exp': 1754478233}
+2025-08-06 10:03:58,603 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 10:03:58,603 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 10:03:58,603 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 10:03:59,221 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 10:04:00,876 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 10:04:01,508 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 10:04:01,767 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 10:04:02,065 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 10:04:02,359 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 10:04:02,359 - main - ERROR - Health check error: 'ResearchService' object has no attribute 'health_check'
+2025-08-06 10:04:02,361 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NDc0NjMzLCJleHAiOjE3NTQ0NzgyMzN9.erpQ6AokHunT6Y2p-i4OB7af0dlZU-MrKhqlh037nio
+2025-08-06 10:04:02,362 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754474633, 'exp': 1754478233}
+2025-08-06 10:04:02,378 - services.chat_service - INFO - Processing chat request for project test_project_123
+2025-08-06 10:04:02,383 - services.chat_service - INFO - Detected task: TaskType.PROJECT_CREATION (confidence: 0.6666666666666666)
+2025-08-06 10:04:02,383 - services.chat_service - INFO - Performing web search
+2025-08-06 10:04:03,310 - services.chat_service - INFO - Enabling research mode
+2025-08-06 10:04:03,310 - services.research_service - INFO - Starting research on topic: Create Me a full  web app for proejct for movie website 
+2025-08-06 10:04:04,328 - arxiv - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=Create+Me+a+full++web+app+for+proejct+for+movie+website+&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+2025-08-06 10:04:05,930 - arxiv - INFO - Got first page: 100 of 2741571 total results
+2025-08-06 10:04:05,932 - services.llm_orchestrator - INFO - Generating response with models: ['groq', 'together', 'openrouter']
+2025-08-06 10:04:11,217 - services.research_service - WARNING - Failed to parse JSON response: Expecting value: line 1 column 1 (char 0)
+2025-08-06 10:04:11,217 - services.llm_orchestrator - INFO - Generating response with models: ['groq', 'together', 'openrouter']
+2025-08-06 10:04:15,794 - services.research_service - WARNING - Failed to parse LLM summary response as JSON: unknown extension ?R at position 12
+2025-08-06 10:04:15,794 - services.research_service - INFO - Research completed for topic: Create Me a full  web app for proejct for movie website 
+2025-08-06 10:04:15,794 - services.chat_service - INFO - Generating response with multi-LLM orchestration
+2025-08-06 10:04:15,794 - services.llm_orchestrator - INFO - Generating response with models: ['together', 'openrouter', 'groq']
+2025-08-06 10:04:18,983 - services.chat_service - INFO - Chat processing completed in 16.62s
+2025-08-06 10:04:18,984 - services.chat_service - INFO - Cleanup completed for project test_project_123
+2025-08-06 10:05:48,279 - main - INFO - 🔄 Shutting down DAMN BOT...

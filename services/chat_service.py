@@ -99,7 +99,8 @@ class ChatService:
                 combined_context, request.dict()
             )
             
-            logger.info(f"Detected task: {task_info['task_type']} (confidence: {task_info['confidence']})")
+            logger.info(f"Detected task: {task_info.task_type} (confidence: {task_info.confidence})")
+
             
             # Step 3: Web search if requested
             search_results = None
@@ -110,12 +111,12 @@ class ChatService:
                 )
                 if search_results:
                     combined_context += f"\n\nWeb search results:\n{search_results['summary']}"
-            
+                print(f"search result is heree {search_results}")
             # Step 4: Research mode if enabled
             research_data = None
             if request.research_mode:
                 logger.info("Enabling research mode")
-                research_data = await self.research_service.deep_research(
+                research_data = await self.research_service.conduct_research(
                     request.prompt, combined_context
                 )
                 if research_data:
@@ -134,7 +135,7 @@ class ChatService:
             logger.info("Generating response with multi-LLM orchestration")
             llm_response = await self.llm_orchestrator.generate_response(
                 prompt=combined_context,
-                task_type=task_info['task_type'],
+                task_type=task_info.task_type,
                 context={
                     'files': processed_files,
                     'search_results': search_results,
@@ -145,7 +146,7 @@ class ChatService:
             
             # Step 7: Code handling if detected
             code_result = None
-            if task_info['task_type'] in ['code_generation', 'code_fix', 'code_review']:
+            if task_info.task_type in ['code_generation', 'code_fix', 'code_review']:
                 logger.info("Processing code-related task")
                 code_result = await self.code_service.handle_code_task(
                     llm_response['text'],
@@ -191,14 +192,21 @@ class ChatService:
                 language=code_result.get('language') if code_result else None,
                 files=code_result.get('files', []) if code_result else [],
                 audio_file=audio_file,
-                sources=search_results.get('sources', []) if search_results else [],
+                sources=[
+    {
+        "title": r.get("title", ""),
+        "url": r.get("url", ""),
+        "snippet": r.get("snippet", "")
+    }
+    for r in search_results.get("results", [])
+] if search_results else [],
                 research_data=research_data,
                 execution_results=code_result.get('execution_results') if code_result else None,
                 llm_scores=llm_response.get('scores', {}),
                 processing_time=processing_time,
                 metadata={
-                    'task_type': task_info['task_type'],
-                    'confidence': task_info['confidence'],
+                    'task_type': task_info.task_type,
+                    'confidence': task_info.confidence,
                     'processed_files': len(processed_files),
                     'web_search_enabled': request.web_search,
                     'voice_enabled': request.voice,

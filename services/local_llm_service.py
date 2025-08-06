@@ -164,7 +164,7 @@ class LocalLLMService:
         
         async with self.session.post(url, json=payload) as response:
             if response.status == 200:
-                result ==payload) as response:
+                result = await response.json()
             if response.status == 200:
                 result = await response.json()
                 return {

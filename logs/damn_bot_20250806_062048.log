@@ -1,0 +1,27 @@
+2025-08-06 06:20:48,856 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-08-06 06:20:48,857 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-08-06 06:20:48,858 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 06:20:48,859 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 06:20:48,859 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 06:20:48,859 - services.local_llm_service - INFO - Local LLM service initialized
+2025-08-06 06:20:48,859 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-08-06 06:20:49,443 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 06:20:51,009 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 06:20:51,342 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 06:20:51,637 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 06:20:51,961 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 06:20:53,100 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 06:20:53,100 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-08-06 06:20:53,101 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-08-06 06:20:53,101 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-08-06 06:20:53,129 - services.chat_service - INFO - Processing chat request for project test_project_123
+2025-08-06 06:20:53,133 - services.chat_service - INFO - Detected task: TaskType.GENERAL_CHAT (confidence: 0.5)
+2025-08-06 06:20:53,134 - services.chat_service - INFO - Generating response with multi-LLM orchestration
+2025-08-06 06:20:53,134 - services.llm_orchestrator - INFO - Generating response with models: ['ollama', 'llamacpp', 'gpt4all']
+2025-08-06 06:20:53,134 - services.llm_orchestrator - ERROR - Local LLM error (llamacpp): Local model llamacpp is not available
+2025-08-06 06:20:53,134 - services.llm_orchestrator - ERROR - Local LLM error (gpt4all): Local model gpt4all is not available
+2025-08-06 06:20:53,135 - services.local_llm_service - ERROR - Local LLM generation error (ollama): Ollama API error: 404 - {"error":"model 'llama3.1:8b' not found"}
+2025-08-06 06:20:53,135 - services.llm_orchestrator - ERROR - Local LLM error (ollama): Ollama API error: 404 - {"error":"model 'llama3.1:8b' not found"}
+2025-08-06 06:20:53,135 - services.llm_orchestrator - ERROR - LLM orchestration error: No LLM responses generated
+2025-08-06 06:20:53,136 - services.chat_service - ERROR - Chat processing error: No LLM responses generated
+2025-08-06 06:20:53,136 - main - ERROR - Chat endpoint error: No LLM responses generated

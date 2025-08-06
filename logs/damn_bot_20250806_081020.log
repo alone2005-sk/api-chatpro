@@ -1,0 +1,19 @@
+2025-08-06 08:10:20,203 - middleware.security - INFO - SecurityMiddleware initialized with secret_key: default_secret
+2025-08-06 08:10:20,203 - main - INFO - 🚀 Starting DAMN BOT AI Chat Agent...
+2025-08-06 08:10:20,221 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-08-06 08:10:20,221 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-08-06 08:10:20,224 - services.local_llm_service - INFO - ✅ ollama is available
+2025-08-06 08:10:20,224 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-06 08:10:20,319 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-06 08:10:20,319 - services.local_llm_service - INFO - Local LLM service initialized
+2025-08-06 08:10:20,320 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-08-06 08:10:20,750 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-06 08:10:22,189 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-06 08:10:23,455 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-06 08:10:23,807 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-08-06 08:10:24,181 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-06 08:10:24,492 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-06 08:10:24,492 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-08-06 08:10:24,494 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-08-06 08:10:24,494 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-08-06 08:10:24,507 - main - INFO - ✅ DAMN BOT AI Chat Agent is ready!

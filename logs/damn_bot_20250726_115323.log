@@ -1,0 +1,19 @@
+2025-07-26 11:53:23,268 - main - INFO - 🚀 Starting DAMN BOT AI Chat Agent...
+2025-07-26 11:53:23,284 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-07-26 11:53:23,284 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-07-26 11:53:23,285 - services.local_llm_service - WARNING - ❌ ollama is not available: localhost:11434/api/tags
+2025-07-26 11:53:23,285 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-07-26 11:53:23,285 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-07-26 11:53:23,285 - services.local_llm_service - INFO - Local LLM service initialized
+2025-07-26 11:53:23,285 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-07-26 11:53:23,858 - services.remote_llm_service - INFO - ✅ together is available
+2025-07-26 11:53:25,186 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-07-26 11:53:25,519 - services.remote_llm_service - INFO - ✅ groq is available
+2025-07-26 11:53:25,775 - services.remote_llm_service - WARNING - ❌ huggingface test failed: 404
+2025-07-26 11:53:26,084 - services.remote_llm_service - INFO - ✅ openai is available
+2025-07-26 11:53:26,399 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-07-26 11:53:26,399 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-07-26 11:53:26,399 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-07-26 11:53:26,399 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-07-26 11:53:26,403 - services.voice_service - WARNING - Failed to initialize pyttsx3: This means you probably do not have eSpeak or eSpeak-ng installed!
+2025-07-26 11:53:26,403 - main - ERROR - ❌ Failed to initialize DAMN BOT: CodeService.__init__() takes 1 positional argument but 2 were given
