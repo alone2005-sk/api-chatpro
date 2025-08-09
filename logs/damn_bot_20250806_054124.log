@@ -1,1 +1,0 @@
-2025-08-06 05:41:24,087 - main - ERROR - Chat endpoint error: 'NoneType' object has no attribute 'process_chat'

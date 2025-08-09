@@ -10,7 +10,22 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any, AsyncGenerator
 import zipfile
-
+from services.task_detector import TaskDetector, TaskType
+from services.llm_orchestrator import LLMOrchestrator
+from services.file_processor import FileProcessor
+from services.web_search import WebSearchService    
+import os
+import logging
+from fastapi import HTTPException, BackgroundTasks, Form
+from pathlib import Path
+import zipfile
+import logging
+from services.self_learning import SelfLearningService
+from services.project_generator import ProjectGenerationService
+from models.requests import UnifiedChatRequest, EnhancedChatResponse
+from core.config import settings
+from core.database import DatabaseManager, Chat, Message, MediaFile
+from services.image_video_generator import ImageVideoGenerator
 from core.database import DatabaseManager, Project, Message, Artifact
 from core.logger import get_logger
 from models.requests import ChatRequest, ChatResponse
@@ -22,12 +37,9 @@ from services.voice_service import VoiceService
 from services.code_service import CodeService
 from services.research_service import ResearchService
 from services.deep_learning_service import DeepLearningService
-
-logger = get_logger(__name__)
-
 class ChatService:
-    """Main chat service coordinating all AI capabilities"""
-    
+    """Core chat processing service with AI capabilities"""
+
     def __init__(
         self,
         db_manager: DatabaseManager,
@@ -38,190 +50,416 @@ class ChatService:
         code_service: CodeService,
         research_service: ResearchService,
         deep_learning_service: DeepLearningService,
+        project_generation_service: ProjectGenerationService,
+        self_learning_service: SelfLearningService,
+        image_video_generator: ImageVideoGenerator,
         settings
     ):
         self.db_manager = db_manager
         self.llm_orchestrator = llm_orchestrator
         self.file_processor = file_processor
-        self.web_search_service = web_search_service
+        self.web_search = web_search_service
         self.voice_service = voice_service
         self.code_service = code_service
         self.research_service = research_service
-        self.deep_learning_service = deep_learning_service
-        self.settings = settings
+        self.deep_learning = deep_learning_service
+        self.project_service = project_generation_service
+        self.learning_service = self_learning_service
+        self.media_generator = image_video_generator
         self.task_detector = TaskDetector()
-        
+
         # Ensure project data directory exists
         self.project_data_dir = Path(settings.PROJECT_DATA_DIR)
         self.project_data_dir.mkdir(exist_ok=True)
+        self.logger = get_logger(__name__)
     
-    async def process_chat(self, request: ChatRequest) -> ChatResponse:
+    async def process_chat(self, request: UnifiedChatRequest, background_tasks) -> EnhancedChatResponse:
         """Process chat request with full AI pipeline"""
         start_time = time.time()
         
-        try:
-            # Generate or use existing project ID
-            project_id = request.project_id or str(uuid.uuid4())
-            
-            # Create project if needed
-            await self._ensure_project_exists(project_id)
-            
-            # Create project directory
-            project_dir = self.project_data_dir / project_id
-            project_dir.mkdir(exist_ok=True)
-            
-            # Log incoming request
-            logger.info(f"Processing chat request for project {project_id}")
-            
-            # Step 1: Process uploaded files
-            file_contents = []
-            processed_files = []
-            
-            if request.files:
-                logger.info(f"Processing {len(request.files)} uploaded files")
-                for file in request.files:
-                    try:
-                        file_result = await self.file_processor.process_file(
-                            file, project_id
-                        )
-                        file_contents.append(file_result.content)
-                        processed_files.append(file_result.dict())
-                    except Exception as e:
-                        logger.error(f"Error processing file {file.filename}: {str(e)}")
-                        continue
-            
-            # Step 2: Detect task type and intent
-            combined_context = request.prompt
-            if file_contents:
-                combined_context += "\n\nFile contents:\n" + "\n".join(file_contents)
-            
-            task_info = await self.task_detector.detect_task(
-                combined_context, request.dict()
+        # Create or get chat session
+        if request.chat_id:
+            chat = await self.db_manager.get_chat(request.chat_id)
+            if not chat:
+                raise HTTPException(status_code=404, detail="Chat session not found")
+        else:
+            title = request.prompt[:50] + "..." if len(request.prompt) > 50 else request.prompt
+            chat = await self.db_manager.create_chat(
+                user_id=request.user_id,
+                title=title,
+                description="AI Agent Session"
             )
-            
-            logger.info(f"Detected task: {task_info.task_type} (confidence: {task_info.confidence})")
-
-            
-            # Step 3: Web search if requested
-            search_results = None
-            if request.web_search:
-                logger.info("Performing web search")
-                search_results = await self.web_search_service.search(
-                    request.prompt, max_results=10
-                )
-                if search_results:
-                    combined_context += f"\n\nWeb search results:\n{search_results['summary']}"
-                print(f"search result is heree {search_results}")
-            # Step 4: Research mode if enabled
-            research_data = None
-            if request.research_mode:
-                logger.info("Enabling research mode")
-                research_data = await self.research_service.conduct_research(
-                    request.prompt, combined_context
-                )
-                if research_data:
-                    combined_context += f"\n\nResearch findings:\n{research_data['summary']}"
-            
-            # Step 5: Deep learning processing if enabled
-            if request.deep_learning:
-                logger.info("Applying deep learning processing")
-                dl_result = await self.deep_learning_service.process(
-                    combined_context, task_info
-                )
-                if dl_result:
-                    combined_context += f"\n\nDeep learning insights:\n{dl_result['analysis']}"
-            
-            # Step 6: Generate response using multi-LLM orchestration
-            logger.info("Generating response with multi-LLM orchestration")
-            llm_response = await self.llm_orchestrator.generate_response(
-                prompt=combined_context,
-                task_type=task_info.task_type,
-                context={
-                    'files': processed_files,
-                    'search_results': search_results,
-                    'research_data': research_data,
-                    'project_id': project_id
-                }
+        
+        # Process files
+        file_contents = []
+        processed_files = []
+        if request.files:
+            for file in request.files:
+                try:
+                    file_result = await self.file_processor.process_file(file, chat.id)
+                    file_contents.append(file_result.content)
+                    processed_files.append(file_result.dict())
+                except Exception as e:
+                    self.logger.error(f"Error processing file {file.filename}: {str(e)}")
+        
+        # Build combined context
+        combined_context = request.prompt
+        if file_contents:
+            combined_context += "\n\nFile contents:\n" + "\n".join(file_contents)
+        
+        # Advanced task detection with new TaskDetector
+        task_info = await self.task_detector.analyze_intent(combined_context, request.dict())
+        self.logger.info(
+            f"Detected task: {task_info.task_type} "
+            f"(confidence: {task_info.confidence:.2f}, "
+            f"complexity: {task_info.complexity_level}, "
+            f"language: {task_info.language})"
+        )
+        
+        # Intent detection pipeline
+        # 1. Media generation (prioritize media tasks)
+        media_enabled = (
+            request.auto_detect_media and 
+            settings.ENABLE_MEDIA_GENERATION and
+            task_info.task_type in (TaskType.IMAGE_CREATION, TaskType.VIDEO_CREATION)
+        )
+        if media_enabled:
+            media_result = await self.media_generator.detect_and_generate_media(
+                combined_context, 
+                request.user_id,
+                task_info=task_info  # Pass task metadata
             )
-            
-            # Step 7: Code handling if detected
-            code_result = None
-            if task_info.task_type in ['code_generation', 'code_fix', 'code_review']:
-                logger.info("Processing code-related task")
-                code_result = await self.code_service.handle_code_task(
-                    llm_response['text'],
-                    task_info,
-                    project_id,
-                    request.code_execution,
-                    request.auto_fix,
-                    request.max_iterations
+            if media_result.get("is_media_request") and media_result.get("success"):
+                return await self.handle_media_generation(
+                    media_result, 
+                    chat.id, 
+                    request, 
+                    start_time, 
+                    background_tasks
                 )
-            
-            # Step 8: Voice generation if requested
-            audio_file = None
-            if request.voice:
-                logger.info("Generating voice output")
-                voice_result = await self.voice_service.generate_speech(
-                    llm_response['text'], project_id
+        
+        # 2. Project generation
+        project_enabled = (
+            request.auto_detect_project and 
+            settings.ENABLE_PROJECT_GENERATION and
+            task_info.task_type == TaskType.PROJECT_CREATION
+        )
+        if project_enabled:
+            project_result = await self.project_service.detect_and_create_project(
+                combined_context, 
+                chat.id, 
+                request.user_id,
+                task_info=task_info  # Pass task metadata
+            )
+            if project_result.get("is_project"):
+                return await self.handle_project_generation(
+                    project_result, 
+                    chat.id, 
+                    request, 
+                    start_time, 
+                    background_tasks
                 )
-                audio_file = voice_result.get('audio_file')
-            
-            # Step 9: Save conversation to database
-            message_id = await self._save_conversation(
-                project_id,
-                request.prompt,
+        
+        # 3. Self-learning
+        learning_result = None
+        if request.enable_learning and settings.ENABLE_SELF_LEARNING:
+            learning_result = await self.learning_service.generate_improved_response(
+                combined_context, 
+                {"chat_id": chat.id, **request.context},
+                request.user_id
+            )
+            if learning_result.get("success") and learning_result.get("confidence", 0) > 0.7:
+                return await self.handle_learning_response(
+                    learning_result, 
+                    chat.id, 
+                    request, 
+                    start_time
+                )
+        
+        # AI processing pipeline
+        # 4. Web search
+        search_results = None
+        if request.web_search:
+            search_results = await self.web_search.search(request.prompt, max_results=10)
+            if search_results:
+                combined_context += f"\n\nSearch Results:\n{search_results['summary']}"
+        
+        # 5. Deep research (enhanced for media/research tasks)
+        research_data = None
+        if request.enable_research and settings.ENABLE_DEEP_RESEARCH:
+            research_depth = "deep" if task_info.task_type == TaskType.RESEARCH else request.research_depth
+            research_result = await self.research_service.conduct_research(
+                combined_context, 
+                chat.id, 
+                research_depth, 
+                {**request.context, "task_info": task_info.dict()}  # Include task metadata
+            )
+            if not research_result.get("error"):
+                research_data = research_result
+                if research_result.get("report", {}).get("report_text", ""):
+                    combined_context += f"\n\nResearch Context:\n{research_result['report']['report_text'][:500]}..."
+        
+        # 6. Deep learning processing
+        if request.deep_learning:
+            dl_result = await self.deep_learning.process(combined_context, task_info)
+            if dl_result:
+                combined_context += f"\n\nDeep Insights:\n{dl_result['analysis']}"
+        
+        # 7. Generate LLM response with task context
+        llm_response = await self.llm_orchestrator.generate_response(
+            prompt=combined_context,
+            #task_info=task_info,  # Full task metadata
+            context={
+                "chat_id": chat.id,
+                "user_id": request.user_id,
+                "research_available": bool(research_data),
+                "files": processed_files,
+                "search_results": search_results,
+                "research_data": research_data,
+                **request.context
+            },
+            user_id=request.user_id,
+            prefer_local=request.prefer_local
+        )
+        
+        # 8. Handle code tasks with enhanced parameters
+        code_result = None
+        code_task_types = [
+            TaskType.CODE_GENERATION, 
+            TaskType.BUG_FIXING, 
+            TaskType.CODE_REVIEW,
+            TaskType.AUTOMATION
+        ]
+        if task_info.task_type in code_task_types:
+            code_result = await self.code_service.handle_code_task(
                 llm_response['text'],
-                {
-                    'files': processed_files,
-                    'search_results': search_results,
-                    'research_data': research_data,
-                    'code_result': code_result,
-                    'task_info': task_info,
-                    'llm_scores': llm_response.get('scores', {})
-                }
+                task_info,  # Full task metadata
+                chat.id,
+                request.code_execution,
+                request.auto_fix,
+                request.max_iterations
             )
-            
-            # Step 10: Prepare response
-            processing_time = time.time() - start_time
-            
-            response = ChatResponse(
-                project_id=project_id,
-                message_id=message_id,
-                text=llm_response['text'],
-                code=code_result.get('code') if code_result else None,
-                language=code_result.get('language') if code_result else None,
-                files=code_result.get('files', []) if code_result else [],
-                audio_file=audio_file,
-                sources=[
-    {
-        "title": r.get("title", ""),
-        "url": r.get("url", ""),
-        "snippet": r.get("snippet", "")
-    }
-    for r in search_results.get("results", [])
-] if search_results else [],
-                research_data=research_data,
-                execution_results=code_result.get('execution_results') if code_result else None,
-                llm_scores=llm_response.get('scores', {}),
-                processing_time=processing_time,
-                metadata={
-                    'task_type': task_info.task_type,
-                    'confidence': task_info.confidence,
-                    'processed_files': len(processed_files),
-                    'web_search_enabled': request.web_search,
-                    'voice_enabled': request.voice,
-                    'research_mode': request.research_mode,
-                    'deep_learning': request.deep_learning
-                }
-            )
-            
-            logger.info(f"Chat processing completed in {processing_time:.2f}s")
-            return response
-            
-        except Exception as e:
-            logger.error(f"Chat processing error: {str(e)}")
-            raise
+        
+        # 9. Generate voice
+        audio_file = None
+        if request.voice:
+            voice_result = await self.voice_service.generate_speech(llm_response['text'], chat.id)
+            audio_file = voice_result.get('audio_file')
+        
+        # 10. Save and return response
+        return await self.save_and_return_response(
+            llm_response,
+            chat.id,
+            request,
+            start_time,
+            background_tasks,
+            code_result=code_result,
+            audio_file=audio_file,
+            research_data=research_data,
+            search_results=search_results,
+            learning_result=learning_result,
+            # task_info=task_info  # Include task metadata in response
+        )
     
+    async def process_chat_stream(self, request: UnifiedChatRequest) -> AsyncGenerator[str, None]:
+        """Process chat request with streaming response"""
+        try:
+            yield json.dumps({"type": "status", "message": "Starting processing..."})
+            
+            # Simplified streaming logic
+            async for chunk in self.llm_orchestrator.generate_response_stream(
+                request.prompt, 
+                "conversational",
+                context={"user_id": request.user_id}
+            ):
+                yield json.dumps({"type": "text", "content": chunk})
+            
+            yield json.dumps({"type": "complete"})
+        
+        except Exception as e:
+            yield json.dumps({"type": "error", "message": str(e)})
+    
+    async def handle_project_generation(self, project_result, chat_id, request, start_time, bg_tasks):
+        """Handle project generation response"""
+        ai_message = await self.db_manager.save_message(
+            chat_id=chat_id,
+            role="assistant",
+            content=f"🚀 Generating {project_result['project_type']} project: {project_result['project_name']}",
+            message_type="project",
+            meta=project_result
+        )
+        
+        if request.enable_learning:
+            bg_tasks.add_task(
+                self.learning_service.learn_from_interaction,
+                request.user_id,
+                chat_id,
+                request.prompt,
+                ai_message.content,
+                None,
+                {"task_type": "project_generation"}
+            )
+        
+        return EnhancedChatResponse(
+            success=True,
+            chat_id=chat_id,
+            message_id=ai_message.id,
+            response=ai_message.content,
+            response_type="project",
+            project_id=project_result.get("project_id"),
+            processing_time=time.time() - start_time,
+            confidence_score=project_result.get("confidence", 0.0)
+        )
+    
+    async def handle_media_generation(self, media_result, chat_id, request, start_time, bg_tasks):
+        """Handle media generation response"""
+        media_files = []
+        if media_result.get("image_path"):
+            media_file = await self.db_manager.save_media_file(
+                chat_id=chat_id,
+                filename=os.path.basename(media_result["image_path"]),
+                file_path=media_result["image_path"],
+                file_type="image",
+                prompt_used=request.prompt
+            )
+            media_files.append({
+                "id": media_file.id,
+                "type": "image",
+                "url": f"/media/{media_file.filename}"
+            })
+        
+        ai_message = await self.db_manager.save_message(
+            chat_id=chat_id,
+            role="assistant",
+            content=f"🎨 Generated {media_result.get('media_type', 'media')}",
+            message_type="media",
+            meta=media_result
+        )
+        
+        if request.enable_learning:
+            bg_tasks.add_task(
+                self.learning_service.learn_from_interaction,
+                request.user_id,
+                chat_id,
+                request.prompt,
+                ai_message.content,
+                None,
+                {"task_type": "media_generation"}
+            )
+        
+        return EnhancedChatResponse(
+            success=True,
+            chat_id=chat_id,
+            message_id=ai_message.id,
+            response=ai_message.content,
+            response_type="media",
+            media_files=media_files,
+            processing_time=time.time() - start_time
+        )
+    
+    async def save_and_return_response(self, llm_response, chat_id, request, start_time, bg_tasks, 
+                                      code_result=None, audio_file=None, research_data=None,
+                                      search_results=None, learning_result=None):
+        content = llm_response.get("text")
+        if content is None:
+               self.logger.error("LLM response content is None")
+               raise HTTPException(status_code=500, detail="LLM response missing 'text' field.")
+        """Save final response and return"""
+        ai_message = await self.db_manager.save_message(
+            chat_id=chat_id,
+            role="assistant",
+            content=content,
+            message_type="text",
+            meta={
+                "model_used": llm_response.get("model"),
+                "tokens_used": llm_response.get("tokens_used", 0)
+            }
+        )
+        
+        if request.enable_learning:
+            bg_tasks.add_task(
+                self.learning_service.learn_from_interaction,
+                request.user_id,
+                chat_id,
+                request.prompt,
+                ai_message.content,
+                None,
+                {"task_type": "chat", "model": llm_response.get("model")}
+            )
+        
+        return EnhancedChatResponse(
+            success=True,
+            chat_id=chat_id,
+            message_id=ai_message.id,
+            response=ai_message.content,
+            response_type="text",
+            model_used=llm_response.get("model"),
+            processing_time=time.time() - start_time,
+            tokens_used=llm_response.get("tokens_used", 0),
+            confidence_score=llm_response.get("confidence", 0.0),
+            code=code_result.get("code") if code_result else None,
+            language=code_result.get("language") if code_result else None,
+            audio_file=audio_file,
+            research_data=research_data,
+            sources=search_results.get("results", [])[:5] if search_results else [],
+            learning_applied=bool(learning_result and learning_result.get("success")),
+            llm_scores=llm_response.get("scores", {}),
+            execution_results=code_result.get("execution_results") if code_result else None,
+            metadata={
+                "processed_files": len(request.files),
+                "research_performed": bool(research_data)
+            }
+        )
+    
+    async def get_user_chats(self, user_id: str, limit: int = 50):
+        """Get user's chat sessions"""
+        chats = await self.db_manager.get_user_chats(user_id, limit)
+        return {
+            "success": True,
+            "chats": [chat.to_dict() for chat in chats]
+        }
+    
+    async def get_chat_messages(self, chat_id: str, limit: int = 50, offset: int = 0):
+        """Get chat messages with pagination"""
+        messages = await self.db_manager.get_chat_messages(chat_id, limit, offset)
+        return {
+            "success": True,
+            "chat_id": chat_id,
+            "messages": [msg.to_dict() for msg in messages]
+        }
+    
+    async def delete_chat(self, chat_id: str):
+        """Delete a chat session"""
+        await self.db_manager.update_chat(chat_id, is_active=False)
+        return {
+            "success": True,
+            "message": "Chat session deleted successfully"
+        }
+    
+    async def get_project_status(self, project_id: str):
+        """Get project generation status"""
+        status = await self.project_service.get_project_status(project_id)
+        if "error" in status:
+            raise HTTPException(status_code=404, detail=status["error"])
+        return status
+    
+    async def create_project_zip(self, project_id: str) -> str:
+        """Create ZIP file of project artifacts"""
+        project_dir = self.project_data_dir / project_id
+        if not project_dir.exists():
+            raise ValueError(f"Project {project_id} not found")
+        
+        zip_path = project_dir / f"project_{project_id}.zip"
+        
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for file_path in project_dir.rglob('*'):
+                if file_path.is_file() and file_path != zip_path:
+                    arcname = file_path.relative_to(project_dir)
+                    zipf.write(file_path, arcname)
+        
+        return str(zip_path)
+    
+
     async def process_chat_stream(self, request: ChatRequest) -> AsyncGenerator[str, None]:
         """Process chat request with streaming response"""
         project_id = request.project_id or str(uuid.uuid4())
@@ -421,7 +659,7 @@ class ChatService:
                 import shutil
                 shutil.rmtree(temp_dir)
             
-            logger.info(f"Cleanup completed for project {project_id}")
+            self.logger.info(f"Cleanup completed for project {project_id}")
             
         except Exception as e:
-            logger.error(f"Cleanup error for project {project_id}: {str(e)}")
+            self.logger.error(f"Cleanup error for project {project_id}: {str(e)}")

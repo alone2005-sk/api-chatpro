@@ -1,10 +1,98 @@
 """
 Request and response models for DAMN BOT AI System
 """
+from datetime import datetime
 
 from pydantic import BaseModel, Field
 from typing import Dict, Any, Optional, List
 from fastapi import UploadFile
+class ChatMessage(BaseModel):
+
+    
+    role: str = Field(..., description="Message role (user, assistant, system)")
+    content: str = Field(..., description="Message content")
+    message_type: str = Field(default="text", description="Message type")
+    timestamp: Optional[str] = None
+
+class UnifiedChatRequest(BaseModel):
+    """Unified request model for all chat capabilities"""
+    prompt: str = Field(..., min_length=1, max_length=5000, description="User message")
+    files: List[UploadFile] = Field([], description="Uploaded files")
+    chat_id: Optional[str] = Field(None, description="Existing chat session ID")
+    user_id: str = Field(default="anonymous", description="User identifier")
+    stream: bool = Field(False, description="Enable streaming response")
+    
+    # AI Options
+    enable_research: bool = Field(False, description="Enable deep research")
+    research_depth: str = Field("comprehensive", description="Research depth")
+    enable_learning: bool = Field(True, description="Enable self-learning")
+    prefer_local: bool = Field(True, description="Prefer local LLMs")
+    
+    # Generation Options
+    auto_detect_project: bool = Field(True, description="Auto-detect project creation")
+    auto_detect_media: bool = Field(True, description="Auto-detect media generation")
+    
+    # Advanced Features
+    web_search: bool = Field(False, description="Enable web search")
+    voice: bool = Field(False, description="Enable voice generation")
+    research_mode: bool = Field(False, description="Enable research mode")
+    deep_learning: bool = Field(False, description="Enable deep learning processing")
+    code_execution: bool = Field(True, description="Enable code execution")
+    auto_fix: bool = Field(True, description="Enable auto-fixing of code")
+    language: str = Field("auto", description="Programming language for code tasks")
+    max_iterations: int = Field(3, description="Max iterations for code fixing")
+    
+    # Context
+    context: Dict[str, Any] = Field(default_factory=dict, description="Additional context")
+
+class EnhancedChatResponse(BaseModel):
+    """Enhanced response model with all AI capabilities"""
+    success: bool = Field(..., description="Request success status")
+    chat_id: str = Field(..., description="Chat session ID")
+    message_id: str = Field(..., description="Message ID")
+    
+    # Response content
+    response: str = Field(..., description="AI response text")
+    response_type: str = Field("text", description="Response type")
+    
+    # Generated content
+    project_id: Optional[str] = Field(None, description="Generated project ID")
+    media_files: List[Dict[str, Any]] = Field([], description="Generated media files")
+    research_session_id: Optional[str] = Field(None, description="Research session ID")
+    code: Optional[str] = Field(None, description="Generated code content")
+    language: Optional[str] = Field(None, description="Programming language of generated code")
+    audio_file: Optional[str] = Field(None, description="URL to generated audio file")
+    research_data: Optional[Dict] = Field(None, description="Research findings")
+    execution_results: Optional[Dict] = Field(None, description="Code execution results")
+    
+    # Metadata
+    model_used: Optional[str] = Field(None, description="LLM model used")
+    processing_time: float = Field(..., description="Processing time in seconds")
+    tokens_used: int = Field(0, description="Tokens consumed")
+    confidence_score: float = Field(0.0, description="Response confidence")
+    llm_scores: Dict[str, float] = Field(default_factory=dict, description="LLM quality scores")
+    
+    # Learning
+    learning_applied: bool = Field(False, description="Self-learning was applied")
+    patterns_used: int = Field(0, description="Learning patterns used")
+    
+    # Sources
+    sources: List[Dict[str, Any]] = Field([], description="Research sources")
+    
+    # Metadata
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Processing metadata")
+    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
+
+class ProjectStatusResponse(BaseModel):
+    project_id: str
+    name: str
+    status: str
+    progress: int
+    created_at: str
+    completed_at: Optional[str] = None
+    file_path: Optional[str] = None
+    zip_path: Optional[str] = None
+    metadata: Dict[str, Any] = {}
 
 class TaskRequest(BaseModel):
     prompt: str = Field(..., min_length=1, max_length=5000, description="User prompt/request")

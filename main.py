@@ -4,6 +4,22 @@ FastAPI backend with multi-LLM orchestration, file processing, web search, and v
 """
 
 import os
+
+import asyncio
+import logging
+import os
+import time
+from contextlib import asynccontextmanager
+from datetime import datetime
+from typing import Dict, List, Optional, Any
+import json
+import logging
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, Form, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, FileResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
+import uvicorn
 import asyncio
 import logging
 from contextlib import asynccontextmanager
@@ -31,8 +47,12 @@ from services.deep_learning_service import DeepLearningService
 from models.requests import ChatRequest, ChatResponse
 from middleware.security import SecurityMiddleware
 from middleware.rate_limiter import RateLimitMiddleware
-
-
+from services.research_service import ResearchService
+from services.deep_research import DeepResearchService
+from services.self_learning import SelfLearningService
+from services.project_generator import ProjectGenerationService
+from services.image_video_generator import ImageVideoGenerator
+from models.requests import UnifiedChatRequest, EnhancedChatResponse, ProjectStatusResponse
 # Initialize settings and logging
 settings = Settings()
 setup_logging(settings.LOG_LEVEL)
@@ -48,12 +68,18 @@ code_service = None
 research_service = None
 deep_learning_service = None
 db_manager = None
+deep_research_service = None
+self_learning_service = None
+project_generation_service = None
+image_video_generator = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifecycle management"""
     global chat_service, llm_orchestrator, file_processor, web_search_service
     global voice_service, code_service, research_service, deep_learning_service, db_manager
+    global db_manager, llm_orchestrator, deep_research_service
+    global self_learning_service, project_generation_service, image_video_generator
     
     logger.info("🚀 Starting DAMN BOT AI Chat Agent...")
     
@@ -74,6 +100,17 @@ async def lifespan(app: FastAPI):
         
         voice_service = VoiceService(settings)
         await voice_service.initialize()
+        # deep_research_service = DeepResearchService(llm_orchestrator, db_manager)
+        # await deep_research_service.initialize()
+        
+        self_learning_service = SelfLearningService(llm_orchestrator, db_manager)
+        await self_learning_service.initialize()
+        
+        project_generation_service = ProjectGenerationService(llm_orchestrator, db_manager)
+        await project_generation_service.initialize()
+        
+        image_video_generator = ImageVideoGenerator(llm_orchestrator)
+        await image_video_generator.initialize()
         
         # code_service = CodeService(settings)
         # await code_service.initialize()
@@ -89,17 +126,20 @@ async def lifespan(app: FastAPI):
         # await deep_learning_service.initialize()
         
         chat_service = ChatService(
-            db_manager=db_manager,
-            llm_orchestrator=llm_orchestrator,
-            file_processor=file_processor,
-            web_search_service=web_search_service,
-            voice_service=voice_service,
-            code_service=code_service,
-            research_service=research_service,
-            deep_learning_service=deep_learning_service,
-            settings=settings
-        )
-        
+    db_manager=db_manager,
+    llm_orchestrator=llm_orchestrator,
+    file_processor=file_processor,
+    web_search_service=web_search_service,
+    voice_service=voice_service,
+    code_service=code_service,
+    research_service=research_service,
+    deep_learning_service=deep_learning_service,
+    project_generation_service=project_generation_service,
+    self_learning_service=self_learning_service,
+    image_video_generator=image_video_generator,
+    settings=settings
+)
+
         logger.info("✅ DAMN BOT AI Chat Agent is ready!")
         
     except Exception as e:
@@ -148,160 +188,429 @@ app.add_middleware(RateLimitMiddleware, max_requests=settings.RATE_LIMIT_CALLS, 
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-@app.post("/chat", response_model=ChatResponse)
-async def chat_endpoint(
+if os.path.exists(settings.GENERATED_MEDIA_DIR):
+    app.mount("/media", StaticFiles(directory=settings.GENERATED_MEDIA_DIR), name="media")
+
+# Request/Response Models
+class ChatMessage(BaseModel):
+    role: str = Field(..., description="Message role (user, assistant, system)")
+    content: str = Field(..., description="Message content")
+    message_type: str = Field(default="text", description="Message type")
+    timestamp: Optional[str] = None
+
+class ChatRequest(BaseModel):
+    message: str = Field(..., min_length=1, max_length=5000, description="User message")
+    chat_id: Optional[str] = Field(None, description="Chat session ID")
+    user_id: str = Field(default="anonymous", description="User identifier")
+    
+    # AI Options
+    enable_research: bool = Field(default=False, description="Enable deep research")
+    research_depth: str = Field(default="comprehensive", description="Research depth")
+    enable_learning: bool = Field(default=True, description="Enable self-learning")
+    prefer_local: bool = Field(default=True, description="Prefer local LLMs")
+    
+    # Generation Options
+    auto_detect_project: bool = Field(default=True, description="Auto-detect project creation")
+    auto_detect_media: bool = Field(default=True, description="Auto-detect media generation")
+    
+    # Context
+    context: Optional[Dict[str, Any]] = Field(default={}, description="Additional context")
+
+class ChatResponse(BaseModel):
+    success: bool = Field(..., description="Request success status")
+    chat_id: str = Field(..., description="Chat session ID")
+    message_id: str = Field(..., description="Message ID")
+    
+    # Response content
+    response: str = Field(..., description="AI response text")
+    response_type: str = Field(default="text", description="Response type")
+    
+    # Generated content
+    project_id: Optional[str] = Field(None, description="Generated project ID")
+    media_files: List[Dict[str, Any]] = Field(default=[], description="Generated media files")
+    research_session_id: Optional[str] = Field(None, description="Research session ID")
+    
+    # Metadata
+    model_used: Optional[str] = Field(None, description="LLM model used")
+    processing_time: float = Field(..., description="Processing time in seconds")
+    tokens_used: int = Field(default=0, description="Tokens consumed")
+    confidence_score: float = Field(default=0.0, description="Response confidence")
+    
+    # Learning
+    learning_applied: bool = Field(default=False, description="Self-learning was applied")
+    patterns_used: int = Field(default=0, description="Learning patterns used")
+    
+    # Sources
+    research_sources: List[Dict[str, Any]] = Field(default=[], description="Research sources")
+    
+    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
+
+class ProjectStatusResponse(BaseModel):
+    project_id: str
+    name: str
+    status: str
+    progress: int
+    created_at: str
+    completed_at: Optional[str] = None
+    file_path: Optional[str] = None
+    zip_path: Optional[str] = None
+    metadata: Dict[str, Any] = {}
+
+# Main chat endpoint
+@app.post("/chat", response_model=EnhancedChatResponse)
+async def unified_chat_endpoint(
     background_tasks: BackgroundTasks,
     prompt: Optional[str] = Form(None),
     files: List[UploadFile] = File(None),
     web_search: bool = Form(False),
     voice: bool = Form(False),
-    project_id: Optional[str] = Form(None),
+    chat_id: Optional[str] = Form(None),
+    user_id: str = Form("anonymous"),
     stream: bool = Form(False),
     research_mode: bool = Form(False),
     deep_learning: bool = Form(False),
     code_execution: bool = Form(True),
     auto_fix: bool = Form(True),
     language: Optional[str] = Form("auto"),
-    max_iterations: int = Form(3)
+    max_iterations: int = Form(3),
+    enable_research: bool = Form(False),
+    research_depth: str = Form("comprehensive"),
+    enable_learning: bool = Form(True),
+    prefer_local: bool = Form(True),
+    auto_detect_project: bool = Form(True),
+    auto_detect_media: bool = Form(True),
+    context: Optional[str] = Form("{}")
 ):
-    """
-    Unified AI Chat endpoint - handles all AI tasks through a single interface
-    
-    Features:
-    - Multi-LLM orchestration with intelligent response merging
-    - File processing (PDF, DOCX, TXT, audio, video, images)
-    - Web search integration with live results
-    - Voice generation with multiple TTS engines
-    - Code generation with auto-testing and fixing
-    - Research mode with deep analysis
-    - Deep learning integration for specialized tasks
-    - Session tracking and history management
-    - Streaming responses support
-    """
+    """Unified AI chat endpoint with comprehensive capabilities"""
     try:
-        # Validate input
-        if not prompt and not files:
-            raise HTTPException(
-                status_code=400,
-                detail="Either prompt or files must be provided"
-            )
-        
-        # Create chat request
-        chat_request = ChatRequest(
+        request = UnifiedChatRequest(
             prompt=prompt or "",
             files=files or [],
             web_search=web_search,
             voice=voice,
-            project_id=project_id,
+            chat_id=chat_id,
+            user_id=user_id,
             stream=stream,
             research_mode=research_mode,
             deep_learning=deep_learning,
             code_execution=code_execution,
             auto_fix=auto_fix,
             language=language,
-            max_iterations=max_iterations
+            max_iterations=max_iterations,
+            enable_research=enable_research,
+            research_depth=research_depth,
+            enable_learning=enable_learning,
+            prefer_local=prefer_local,
+            auto_detect_project=auto_detect_project,
+            auto_detect_media=auto_detect_media,
+            context=json.loads(context) if context else {}
         )
         
-        # Process chat request
-        if stream:
+        if request.stream:
             return StreamingResponse(
-                chat_service.process_chat_stream(chat_request),
+                chat_service.process_chat_stream(request),
                 media_type="text/event-stream"
             )
-        else:
-            response = await chat_service.process_chat(chat_request)
             
-            # Add background tasks for cleanup and learning
-            background_tasks.add_task(
-                chat_service.post_process_cleanup,
-                chat_request.project_id or response.project_id
-            )
-            
-            return response
-            
+        return await chat_service.process_chat(request, background_tasks)
+        
     except Exception as e:
-        logger.error(f"Chat endpoint error: {str(e)}")
+        logger.error(f"Chat endpoint error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/status")
-async def health_check():
-    """System health check endpoint"""
+@app.get("/chats/{user_id}")
+async def get_user_chats(user_id: str, limit: int = 50):
+    """Get user's chat sessions"""
     try:
-        status = {
+        return await chat_service.get_user_chats(user_id, limit)
+    except Exception as e:
+        logger.error(f"Get user chats error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/chats/{chat_id}/messages")
+async def get_chat_messages(chat_id: str, limit: int = 50, offset: int = 0):
+    """Get chat messages with pagination"""
+    try:
+        return await chat_service.get_chat_messages(chat_id, limit, offset)
+    except Exception as e:
+        logger.error(f"Get chat messages error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/chats/{chat_id}")
+async def delete_chat(chat_id: str):
+    """Delete a chat session"""
+    try:
+        return await chat_service.delete_chat(chat_id)
+    except Exception as e:
+        logger.error(f"Delete chat error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/projects/{project_id}/status", response_model=ProjectStatusResponse)
+async def get_project_status(project_id: str):
+    """Get project generation status"""
+    try:
+        return await chat_service.get_project_status(project_id)
+    except Exception as e:
+        logger.error(f"Get project status error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/projects/{project_id}/download")
+async def download_project(project_id: str):
+    """Download generated project as ZIP"""
+    try:
+        zip_path = await chat_service.create_project_zip(project_id)
+        return FileResponse(
+            path=zip_path,
+            filename=f"project_{project_id}.zip",
+            media_type="application/zip"
+        )
+    except Exception as e:
+        logger.error(f"Download project error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Media generation endpoints
+@app.post("/generate/image")
+async def generate_image(
+    prompt: str = Form(...),
+    style: str = Form("photorealistic"),
+    size: str = Form("1024x1024"),
+    user_id: str = Form("anonymous")
+):
+    """Generate image from text prompt"""
+    try:
+        result = await image_video_generator.generate_image(
+            prompt=prompt,
+            style=style,
+            size=size,
+            user_id=user_id
+        )
+        
+        if result.get("success"):
+            return {
+                "success": True,
+                "image_url": f"/media/{os.path.basename(result['image_path'])}",
+                "image_path": result["image_path"],
+                "provider_used": result.get("provider_used"),
+                "generation_time": result.get("generation_time", 0),
+                "timestamp": datetime.now().isoformat()
+            }
+        else:
+            raise HTTPException(status_code=500, detail=result.get("error", "Image generation failed"))
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Image generation error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@app.post("/generate/video")
+async def generate_video(
+    prompt: str = Form(...),
+    style: str = Form("cinematic"),
+    duration: int = Form(5),
+    user_id: str = Form("anonymous")
+):
+    try:
+        result = await image_video_generator.generate_video(
+            prompt=prompt,
+            style=style,
+            duration=duration,
+            user_id=user_id
+        )
+        if result.get("success"):
+            return {
+                "success": True,
+                "video_url": f"/media/{os.path.basename(result['video_path'])}",
+                "video_path": result["video_path"],
+                "provider_used": result.get("provider_used"),
+                "generation_time": result.get("generation_time", 0),
+                "timestamp": datetime.now().isoformat()
+            }
+        else:
+            error_msg = result.get("error", "Video generation failed")
+            logger.error(f"Video generation failed: {error_msg}")
+            raise HTTPException(status_code=500, detail=error_msg)
+    except Exception as e:
+        logger.exception("Exception during video generation")  # This logs the full stack trace
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Research endpoints
+@app.post("/research")
+async def conduct_research(
+    query: str = Form(...),
+    research_type: str = Form("comprehensive"),
+    chat_id: Optional[str] = Form(None),
+    user_id: str = Form("anonymous")
+):
+    """Conduct deep research on a topic"""
+    try:
+        # Create temporary chat if none provided
+        if not chat_id:
+            chat = await db_manager.create_chat(
+                user_id=user_id,
+                title=f"Research: {query[:50]}",
+                description="Research session"
+            )
+            chat_id = chat.id
+        
+        result = await deep_research_service.conduct_research(
+            query=query,
+            chat_id=chat_id,
+            research_type=research_type
+        )
+        
+        if "error" in result:
+            raise HTTPException(status_code=500, detail=result["error"])
+        
+        return {
+            "success": True,
+            "session_id": result["session_id"],
+            "query": result["query"],
+            "research_type": result["research_type"],
+            "report": result["report"],
+            "sources_count": len(result.get("sources", [])),
+            "processing_time": result["processing_time"],
+            "confidence_score": result["report"].get("confidence_score", 0.0),
+            "timestamp": result["timestamp"]
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Research error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Learning endpoints
+@app.post("/feedback")
+async def submit_feedback(
+    message_id: str = Form(...),
+    rating: int = Form(..., ge=1, le=5),
+    helpful: bool = Form(False),
+    accurate: bool = Form(False),
+    comments: Optional[str] = Form(None)
+):
+    """Submit feedback for AI response"""
+    try:
+        # This would update the learning system with user feedback
+        # For now, we'll just acknowledge the feedback
+        
+        feedback_data = {
+            "rating": rating,
+            "helpful": helpful,
+            "accurate": accurate,
+            "comments": comments,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        # In a full implementation, this would update the message in the database
+        # and trigger learning updates
+        
+        return {
+            "success": True,
+            "message": "Feedback received successfully",
+            "feedback_id": f"feedback_{int(time.time())}"
+        }
+        
+    except Exception as e:
+        logger.error(f"Feedback submission error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# System status endpoints
+@app.get("/health")
+async def health_check():
+    """System health check"""
+    try:
+        health_status = {
             "status": "healthy",
             "timestamp": datetime.now().isoformat(),
             "version": "1.0.0",
             "services": {}
         }
         
-        # Check service health
+        # Check each service
         if llm_orchestrator:
-            status["services"]["llm_orchestrator"] = await llm_orchestrator.health_check()
-        if file_processor:
-            status["services"]["file_processor"] = await file_processor.health_check()
-        if web_search_service:
-            status["services"]["web_search"] = await web_search_service.health_check()
-        if voice_service:
-            status["services"]["voice"] = await voice_service.health_check()
-        if code_service:
-            status["services"]["code"] = await code_service.health_check()
-        if research_service:
-            status["services"]["research"] = await research_service.health_check()
-        if deep_learning_service:
-            status["services"]["deep_learning"] = await deep_learning_service.health_check()
+            health_status["services"]["llm_orchestrator"] = await llm_orchestrator.health_check()
         
-        return JSONResponse(status)
+        if deep_research_service:
+            health_status["services"]["deep_research"] = await deep_research_service.health_check()
+        
+        if self_learning_service:
+            health_status["services"]["self_learning"] = await self_learning_service.health_check()
+        
+        if project_generation_service:
+            health_status["services"]["project_generation"] = await project_generation_service.health_check()
+        
+        if image_video_generator:
+            health_status["services"]["media_generation"] = await image_video_generator.health_check()
+        
+        return health_status
         
     except Exception as e:
         logger.error(f"Health check error: {str(e)}")
-        return JSONResponse(
-            {"status": "unhealthy", "error": str(e)},
-            status_code=500
-        )
+        return {
+            "status": "unhealthy",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }
 
-@app.get("/projects/{project_id}/history")
-async def get_project_history(project_id: str):
-    """Get complete project history and artifacts"""
+@app.get("/stats")
+async def get_system_stats():
+    """Get system statistics"""
     try:
-        history = await chat_service.get_project_history(project_id)
-        return JSONResponse(history)
+        stats = {
+            "timestamp": datetime.now().isoformat(),
+            "uptime": time.time(),  # This would be calculated properly
+            "services": {}
+        }
+        
+        # Get stats from each service
+        if llm_orchestrator:
+            stats["services"]["llm_orchestrator"] = await llm_orchestrator.get_provider_stats()
+        
+        if deep_research_service:
+            stats["services"]["deep_research"] = await deep_research_service.get_research_stats()
+        
+        if self_learning_service:
+            stats["services"]["self_learning"] = await self_learning_service.get_learning_stats()
+        
+        return stats
+        
     except Exception as e:
-        logger.error(f"Project history error: {str(e)}")
+        logger.error(f"Stats error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/projects/{project_id}/download")
-async def download_project_artifacts(project_id: str):
-    """Download project artifacts as ZIP file"""
-    try:
-        zip_path = await chat_service.create_project_zip(project_id)
-        return FileResponse(
-            zip_path,
-            filename=f"project_{project_id}.zip",
-            media_type="application/zip"
-        )
-    except Exception as e:
-        logger.error(f"Download error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+# Root endpoint
+@app.get("/")
+async def root():
+    """Root endpoint with API information"""
+    return {
+        "name": "Professional AI Agent Backend",
+        "version": "1.0.0",
+        "description": "Complete AI backend with chat history, project generation, media creation, and self-learning",
+        "features": [
+            "Chat with history management",
+            "Automatic project detection and generation",
+            "Image and video generation",
+            "Deep research with multiple sources",
+            "Self-learning from user interactions",
+            "Professional code generation",
+            "Real-time status updates"
+        ],
+        "endpoints": {
+            "chat": "/chat",
+            "chats": "/chats/{user_id}",
+            "messages": "/chats/{chat_id}/messages",
+            "projects": "/projects/{project_id}/status",
+            "research": "/research",
+            "generate_image": "/generate/image",
+            "generate_video": "/generate/video",
+            "health": "/health",
+            "stats": "/stats",
+            "docs": "/docs"
+        },
+        "timestamp": datetime.now().isoformat()
+    }
 
-@app.get("/metrics")
-async def get_metrics():
-    """Get system metrics and statistics"""
-    try:
-        metrics = await chat_service.get_system_metrics()
-        return JSONResponse(metrics)
-    except Exception as e:
-        logger.error(f"Metrics error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/models")
-async def get_available_models():
-    """Get available LLM models and their status"""
-    try:
-        models = await llm_orchestrator.get_available_models()
-        return JSONResponse(models)
-    except Exception as e:
-        logger.error(f"Models error: {str(e)}")
-        raise HTTPException(status_code=5000, detail=str(e))
 
 if __name__ == "__main__":
     uvicorn.run(

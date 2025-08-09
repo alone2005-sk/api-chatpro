@@ -1,11 +1,10 @@
 """
-Advanced Task Detection and Intent Analysis
-Automatically detects user intent and task types from natural language
+Advanced Task Detection and Intent Analysis with Media Creation Support
 """
 
 import re
 import json
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Tuple
 from dataclasses import dataclass
 from enum import Enum
 import logging
@@ -20,7 +19,8 @@ class TaskType(Enum):
     CODE_EXECUTION = "code_execution"
     BUG_FIXING = "bug_fixing"
     CODE_REVIEW = "code_review"
-    TESTING = "testing"
+    TESTING = "testing",
+    WEB_APP = "web_app"
     DOCUMENTATION = "documentation"
     API_CREATION = "api_creation"
     DATABASE_DESIGN = "database_design"
@@ -28,6 +28,16 @@ class TaskType(Enum):
     ANALYSIS = "analysis"
     LEARNING = "learning"
     GENERAL_CHAT = "general_chat"
+    IMAGE_CREATION = "image_creation"
+    VIDEO_CREATION = "video_creation"
+    UI_DESIGN = "ui_design"
+    DATA_ANALYSIS = "data_analysis"
+    RESEARCH = "research"
+    PRESENTATION = "presentation"
+    CONTENT_WRITING = "content_writing"
+    MUSIC_GENERATION = "music_generation"
+    GAME_DEVELOPMENT = "game_development"
+    AUTOMATION = "automation"
 
 class ProjectPlatform(Enum):
     WEB = "web"
@@ -97,7 +107,82 @@ class TaskDetector:
             TaskType.DEPLOYMENT: [
                 r"deploy.*app|deployment|docker.*container|kubernetes",
                 r"cloud.*deployment|aws.*deploy|heroku.*deploy"
+            ],
+            TaskType.IMAGE_CREATION: [
+                r"generate (an|a) image|create (an|a) image|draw (an|a) picture",
+                r"visual of|visualize|generate art|create art|digital art",
+                r"picture of|photo of|illustration of|logo for|icon for",
+                r"banner for|poster for|thumbnail for|graphic for|render",
+                r"dalle|stable diffusion|midjourney|image prompt"
+            ],
+            TaskType.VIDEO_CREATION: [
+                r"generate (a|an) video|create (a|an) video|make (a|an) video",
+                r"animation of|animated video|video clip|short video",
+                r"video content|video presentation|explainer video|tutorial video",
+                r"promotional video|video ad|reel for|motion graphics",
+                r"kinetic typography|video editing|video generation",
+                r"pika|runway|synthesia"
+            ],
+            TaskType.UI_DESIGN: [
+                r"ui design|user interface|ux design|user experience",
+                r"wireframe|mockup|prototype|figma design|adobe xd",
+                r"sketch design|design system|component library|style guide"
+            ],
+            TaskType.DATA_ANALYSIS: [
+                r"analyze data|data analysis|data visualization|create chart",
+                r"generate graph|statistical analysis|data insights|data report",
+                r"excel analysis|pandas analysis|plotly graph|dashboard for",
+                r"business intelligence|bi report"
+            ],
+            TaskType.RESEARCH: [
+                r"research on|find information about|gather data on",
+                r"summarize information about|explain concept of|background on",
+                r"context for|detailed information about|comprehensive analysis of",
+                r"literature review"
+            ],
+            TaskType.PRESENTATION: [
+                r"create presentation|powerpoint for|google slides for|slide deck",
+                r"pitch deck|presentation slides|keynote presentation|create slides"
+            ],
+            TaskType.CONTENT_WRITING: [
+                r"write blog post|create article|generate content",
+                r"write marketing copy|product description|social media content",
+                r"email campaign|landing page copy|ad copy|script for video"
+            ],
+            TaskType.MUSIC_GENERATION: [
+                r"generate music|create song|compose music|background music",
+                r"jingle for|audio track|soundtrack|midi file|suno|udio|audio generation"
+            ],
+            TaskType.GAME_DEVELOPMENT: [
+                r"create game|game development|unity game|unreal engine",
+                r"game design|2d game|3d game|game mechanics|game level design",
+                r"character design"
+            ],
+            TaskType.AUTOMATION: [
+                r"automate|script to|bot for|workflow automation|automate process",
+                r"automation script|automate task|robotic process automation|rpa",
+                r"automated solution"
             ]
+        }
+        
+        # Weighted keywords for special boosts
+        self.keyword_weights = {
+            "full": 2.0,
+            "complete": 2.0,
+            "entire": 2.0,
+            "whole": 2.0,
+            "complex": 1.5,
+            "detailed": 1.5,
+            "comprehensive": 1.5,
+            "professional": 1.5,
+            "high-quality": 1.5,
+            "urgent": 1.3,
+            "important": 1.3,
+            "advanced": 1.3,
+            "simple": 0.7,
+            "basic": 0.7,
+            "quick": 0.7,
+            "draft": 0.5
         }
         
         self.language_patterns = {
@@ -142,10 +227,31 @@ class TaskDetector:
             ProjectPlatform.BLOCKCHAIN: r"blockchain|crypto|smart.*contract|web3",
             ProjectPlatform.GAME: r"game|unity|unreal|pygame|game.*engine"
         }
+        
+        # Media style patterns
+        self.media_styles = {
+            "photorealistic": r"photo.*real|realistic|real life|photograph|photo",
+            "cartoon": r"cartoon|anime|comic|manga|animated",
+            "minimalist": r"minimal|simple|clean|flat design",
+            "3d": r"3d|three.*dimensional|blender|cinema4d|maya",
+            "pixel": r"pixel|8bit|16bit|retro|arcade",
+            "watercolor": r"watercolor|painting|artistic|brush",
+            "cyberpunk": r"cyberpunk|neon|futuristic|sci.*fi",
+            "vector": r"vector|illustration|svg|line art",
+            "isometric": r"isometric|axonometric|2.5d"
+        }
+        
+        # Media aspect ratios
+        self.aspect_ratios = {
+            "square": r"square|1:1",
+            "landscape": r"landscape|16:9|widescreen|horizontal",
+            "portrait": r"portrait|9:16|vertical|phone screen",
+            "cinematic": r"cinematic|21:9|ultrawide|wide screen"
+        }
     
     async def initialize(self):
         """Initialize the task detector"""
-        logger.info("Task Detector initialized")
+        logger.info("Advanced Task Detector initialized")
     
     async def analyze_intent(self, prompt: str, context: Dict = None) -> TaskInfo:
         """Analyze user prompt to detect intent and task type"""
@@ -189,33 +295,48 @@ class TaskDetector:
             requires_deployment=requires_deployment
         )
     
-    def _detect_task_type(self, prompt: str) -> tuple[TaskType, float]:
-        """Detect the most likely task type"""
-        scores = {}
+    def _detect_task_type(self, prompt: str) -> Tuple[str, float]:
+        prompt_lower = prompt.lower()
+        scores = {task: 0.0 for task in TaskType}
         
+        # 1. Pattern matching (score += 1 per match)
         for task_type, patterns in self.task_patterns.items():
-            score = 0
             for pattern in patterns:
-                matches = len(re.findall(pattern, prompt, re.IGNORECASE))
-                score += matches
-            scores[task_type] = score
+                if re.search(pattern, prompt_lower, re.IGNORECASE):
+                    scores[task_type] += 1.0
         
-        # Special logic for project creation
-        if any(word in prompt for word in ["full", "complete", "entire", "whole"]):
-            scores[TaskType.PROJECT_CREATION] += 2
+        # 2. Keyword weighting example
+        for keyword, weight in self.keyword_weights.items():
+            if keyword in prompt_lower:
+                scores = {task: score * weight if score > 0 else score for task, score in scores.items()}
         
-        # Special logic for mobile apps
-        if any(word in prompt for word in ["mobile", "android", "ios", "app"]):
-            scores[TaskType.MOBILE_APP] += 2
+        # 3. Special boosts (images/videos etc)
+        if any(word in prompt_lower for word in ["image", "picture", "art"]):
+            scores[TaskType.IMAGE_CREATION] += 1.5
         
-        if not any(scores.values()):
-            return TaskType.GENERAL_CHAT, 0.5
+        if any(word in prompt_lower for word in ["video", "animation"]):
+            scores[TaskType.VIDEO_CREATION] += 1.5
         
+        # 4. Detect general chat/research for typical info questions
+        info_queries = ["what is", "who is", "how to", "where is", "when is", "time in", "current time", "weather in", "define", "meaning of"]
+        if any(phrase in prompt_lower for phrase in info_queries):
+            scores[TaskType.GENERAL_CHAT] += 2.0  # boost general chat
+        
+        # 5. Pick best task & calculate confidence
         best_task = max(scores, key=scores.get)
-        confidence = min(scores[best_task] / 3.0, 1.0)
+        max_score = scores[best_task]
         
-        return best_task, confidence
-    
+        # Thresholds for confidence & fallback
+        if max_score < 1.0:
+            # If no strong signal, fallback to GENERAL_CHAT
+            return TaskType.GENERAL_CHAT.name, 0.5
+        
+        confidence = min(max_score / 5.0, 1.0)
+        
+        return best_task.name, confidence
+
+
+        
     def _detect_platform(self, prompt: str) -> Optional[ProjectPlatform]:
         """Detect target platform"""
         for platform, pattern in self.platform_patterns.items():
@@ -240,47 +361,144 @@ class TaskDetector:
     def _extract_parameters(self, prompt: str, task_type: TaskType, context: Dict) -> Dict[str, Any]:
         """Extract task-specific parameters"""
         parameters = {}
+        prompt_lower = prompt.lower()
         
-        if task_type == TaskType.PROJECT_CREATION:
+        # Common parameters
+        parameters["quality_level"] = self._detect_quality_level(prompt_lower)
+        parameters["urgency"] = self._detect_urgency(prompt_lower)
+        
+        # Project creation parameters
+        if task_type in [TaskType.PROJECT_CREATION, TaskType.MOBILE_APP, TaskType.WEB_APP]:
             parameters.update({
-                "include_tests": "test" in prompt.lower(),
-                "include_docs": "document" in prompt.lower(),
-                "include_ci_cd": any(word in prompt.lower() for word in ["ci", "cd", "deploy", "pipeline"]),
-                "include_docker": "docker" in prompt.lower(),
-                "database_needed": any(word in prompt.lower() for word in ["database", "db", "sql", "mongo"])
+                "include_tests": "test" in prompt_lower,
+                "include_docs": "document" in prompt_lower,
+                "include_ci_cd": any(word in prompt_lower for word in ["ci", "cd", "deploy", "pipeline"]),
+                "include_docker": "docker" in prompt_lower,
+                "database_needed": any(word in prompt_lower for word in ["database", "db", "sql", "mongo"])
             })
         
-        elif task_type == TaskType.MOBILE_APP:
+        # Media creation parameters
+        if task_type in [TaskType.IMAGE_CREATION, TaskType.VIDEO_CREATION]:
             parameters.update({
-                "cross_platform": any(word in prompt.lower() for word in ["flutter", "react native", "cross platform"]),
-                "native": any(word in prompt.lower() for word in ["native", "kotlin", "swift"]),
-                "ui_framework": self._detect_ui_framework(prompt.lower())
+                "style": self._detect_media_style(prompt_lower),
+                "aspect_ratio": self._detect_aspect_ratio(prompt_lower),
+                "resolution": self._detect_resolution(prompt_lower),
+                "duration": self._detect_video_duration(prompt_lower) if task_type == TaskType.VIDEO_CREATION else None,
+                "contains_text": any(word in prompt_lower for word in ["text", "caption", "title", "subtitle"])
             })
         
-        elif task_type == TaskType.API_CREATION:
+        # UI design parameters
+        if task_type == TaskType.UI_DESIGN:
             parameters.update({
-                "api_type": "rest" if "rest" in prompt.lower() else "graphql" if "graphql" in prompt.lower() else "rest",
-                "authentication": any(word in prompt.lower() for word in ["auth", "login", "jwt", "oauth"]),
-                "database": any(word in prompt.lower() for word in ["database", "db", "sql"])
+                "components": self._detect_ui_components(prompt_lower),
+                "responsive": any(word in prompt_lower for word in ["responsive", "mobile", "desktop", "tablet"]),
+                "dark_mode": "dark mode" in prompt_lower or "dark theme" in prompt_lower
+            })
+        
+        # Research parameters
+        if task_type == TaskType.RESEARCH:
+            parameters.update({
+                "depth": "deep" in prompt_lower or "detailed" in prompt_lower or "comprehensive" in prompt_lower,
+                "sources": self._detect_research_sources(prompt_lower),
+                "format": self._detect_output_format(prompt_lower)
             })
         
         return parameters
     
-    def _detect_ui_framework(self, prompt: str) -> Optional[str]:
-        """Detect UI framework for mobile apps"""
-        ui_frameworks = {
-            "flutter": r"flutter|dart",
-            "react_native": r"react.*native|rn",
-            "native": r"native|kotlin|swift",
-            "ionic": r"ionic|cordova",
-            "xamarin": r"xamarin|c#"
-        }
-        
-        for framework, pattern in ui_frameworks.items():
+    def _detect_media_style(self, prompt: str) -> str:
+        """Detect media creation style"""
+        for style, pattern in self.media_styles.items():
             if re.search(pattern, prompt, re.IGNORECASE):
-                return framework
+                return style
+        return "photorealistic"  # Default style
+    
+    def _detect_aspect_ratio(self, prompt: str) -> str:
+        """Detect media aspect ratio"""
+        for ratio, pattern in self.aspect_ratios.items():
+            if re.search(pattern, prompt, re.IGNORECASE):
+                return ratio
+        return "landscape"  # Default aspect ratio
+    
+    def _detect_resolution(self, prompt: str) -> str:
+        """Detect media resolution"""
+        if re.search(r"4k|ultra hd|3840", prompt):
+            return "4k"
+        if re.search(r"1080p|full hd|1920", prompt):
+            return "1080p"
+        if re.search(r"720p|hd|1280", prompt):
+            return "720p"
+        return "1080p"  # Default resolution
+    
+    def _detect_video_duration(self, prompt: str) -> int:
+        """Detect video duration in seconds"""
+        duration_match = re.search(r"(\d+)\s*(second|sec|minute|min|hour|hr)", prompt)
+        if duration_match:
+            value = int(duration_match.group(1))
+            unit = duration_match.group(2)
+            if unit.startswith("min"):
+                return value * 60
+            if unit.startswith("hour") or unit.startswith("hr"):
+                return value * 3600
+            return value
         
-        return None
+        # Default durations based on content type
+        if "short" in prompt or "reel" in prompt or "tiktok" in prompt:
+            return 15
+        if "explainer" in prompt or "tutorial" in prompt:
+            return 120
+        return 30  # Default duration
+    
+    def _detect_ui_components(self, prompt: str) -> List[str]:
+        """Detect UI components requested"""
+        components = []
+        if re.search(r"button|cta|call to action", prompt):
+            components.append("buttons")
+        if re.search(r"form|input|field", prompt):
+            components.append("forms")
+        if re.search(r"menu|navigation|nav", prompt):
+            components.append("navigation")
+        if re.search(r"card|tile", prompt):
+            components.append("cards")
+        if re.search(r"modal|dialog|popup", prompt):
+            components.append("modals")
+        return components
+    
+    def _detect_research_sources(self, prompt: str) -> List[str]:
+        """Detect research source types"""
+        sources = []
+        if re.search(r"academic|scholar|paper|study", prompt):
+            sources.append("academic")
+        if re.search(r"web|online|internet", prompt):
+            sources.append("web")
+        if re.search(r"news|article|blog", prompt):
+            sources.append("news")
+        return sources or ["web"]  # Default to web sources
+    
+    def _detect_output_format(self, prompt: str) -> str:
+        """Detect desired output format"""
+        if re.search(r"report|document|pdf", prompt):
+            return "report"
+        if re.search(r"summary|brief|overview", prompt):
+            return "summary"
+        if re.search(r"presentation|slides|ppt", prompt):
+            return "presentation"
+        return "summary"  # Default format
+    
+    def _detect_quality_level(self, prompt: str) -> str:
+        """Detect desired quality level"""
+        if re.search(r"high quality|professional|premium", prompt):
+            return "high"
+        if re.search(r"draft|sketch|rough", prompt):
+            return "low"
+        return "medium"  # Default quality
+    
+    def _detect_urgency(self, prompt: str) -> str:
+        """Detect urgency level"""
+        if re.search(r"urgent|asap|immediately|right now", prompt):
+            return "high"
+        if re.search(r"soon|quick|fast", prompt):
+            return "medium"
+        return "low"  # Default urgency
     
     def _assess_complexity(self, prompt: str, task_type: TaskType) -> int:
         """Assess project complexity (1-5)"""
@@ -299,18 +517,23 @@ class TaskDetector:
             if any(indicator in prompt_lower for indicator in indicators):
                 return level
         
-        # Assess based on task type and features
+        # Assess based on task type
         base_complexity = {
             TaskType.CODE_GENERATION: 2,
             TaskType.PROJECT_CREATION: 4,
             TaskType.MOBILE_APP: 4,
+            TaskType.IMAGE_CREATION: 3,
+            TaskType.VIDEO_CREATION: 4,
+            TaskType.UI_DESIGN: 3,
+            TaskType.RESEARCH: 3,
+            TaskType.DATA_ANALYSIS: 3,
             TaskType.API_CREATION: 3,
             TaskType.DATABASE_DESIGN: 3,
             TaskType.DEPLOYMENT: 3
         }.get(task_type, 2)
         
         # Adjust based on features mentioned
-        feature_count = len(re.findall(r'\b(auth|database|api|test|deploy|docker|ci|cd)\b', prompt_lower))
+        feature_count = len(re.findall(r'\b(auth|database|api|test|deploy|docker|ci|cd|animation|3d|effects)\b', prompt_lower))
         complexity_adjustment = min(feature_count // 2, 2)
         
         return min(base_complexity + complexity_adjustment, 5)
@@ -321,6 +544,11 @@ class TaskDetector:
             TaskType.CODE_GENERATION: 60,
             TaskType.PROJECT_CREATION: 600,
             TaskType.MOBILE_APP: 900,
+            TaskType.IMAGE_CREATION: 120,
+            TaskType.VIDEO_CREATION: 300,
+            TaskType.UI_DESIGN: 180,
+            TaskType.RESEARCH: 240,
+            TaskType.DATA_ANALYSIS: 300,
             TaskType.FILE_OPERATION: 10,
             TaskType.CODE_EXECUTION: 30,
             TaskType.BUG_FIXING: 120,
@@ -332,9 +560,17 @@ class TaskDetector:
         }
         
         base_duration = base_durations.get(task_type, 60)
-        complexity_multiplier = complexity * 0.5
+        complexity_multiplier = 0.5 + (complexity * 0.3)
         
-        return int(base_duration * complexity_multiplier)
+        # Apply urgency multiplier
+        urgency = parameters.get("urgency", "low")
+        urgency_multiplier = {
+            "high": 0.7,
+            "medium": 0.9,
+            "low": 1.0
+        }.get(urgency, 1.0)
+        
+        return int(base_duration * complexity_multiplier * urgency_multiplier)
     
     def _requires_testing(self, prompt: str, task_type: TaskType) -> bool:
         """Check if task requires testing"""
@@ -344,7 +580,12 @@ class TaskDetector:
             return True
         
         # Automatically require testing for certain task types
-        return task_type in [TaskType.PROJECT_CREATION, TaskType.API_CREATION, TaskType.MOBILE_APP]
+        return task_type in [
+            TaskType.PROJECT_CREATION, 
+            TaskType.API_CREATION, 
+            TaskType.MOBILE_APP,
+            TaskType.CODE_GENERATION
+        ]
     
     def _requires_deployment(self, prompt: str, task_type: TaskType) -> bool:
         """Check if task requires deployment"""
@@ -353,7 +594,11 @@ class TaskDetector:
         if any(indicator in prompt for indicator in deploy_indicators):
             return True
         
-        return task_type in [TaskType.PROJECT_CREATION, TaskType.API_CREATION]
+        return task_type in [
+            TaskType.PROJECT_CREATION, 
+            TaskType.API_CREATION,
+            TaskType.MOBILE_APP
+        ]
     
     async def get_status(self) -> Dict[str, Any]:
         """Get task detector status"""
@@ -362,8 +607,42 @@ class TaskDetector:
             "supported_platforms": [platform.value for platform in ProjectPlatform],
             "supported_languages": list(self.language_patterns.keys()),
             "supported_frameworks": list(self.framework_patterns.keys()),
+            "media_styles": list(self.media_styles.keys()),
             "status": "ready"
         }
+    
     async def detect_task(self, prompt: str, context: Dict = None) -> TaskInfo:
         """Alias for analyze_intent for backward compatibility"""
         return await self.analyze_intent(prompt, context)
+    
+    async def explain_detection(self, prompt: str) -> Dict[str, Any]:
+        """Explain task detection with scores and reasons"""
+        task_info = await self.analyze_intent(prompt)
+        prompt_lower = prompt.lower()
+        
+        explanation = {
+            "task": task_info.task_type.value,
+            "confidence": task_info.confidence,
+            "parameters": task_info.parameters,
+            "matches": [],
+            "keywords": []
+        }
+        
+        # Find matching patterns
+        for pattern in self.task_patterns.get(task_info.task_type, []):
+            matches = re.findall(pattern, prompt_lower, re.IGNORECASE)
+            if matches:
+                explanation["matches"].append({
+                    "pattern": pattern,
+                    "count": len(matches)
+                })
+        
+        # Find weighted keywords
+        for keyword, weight in self.keyword_weights.items():
+            if keyword in prompt_lower:
+                explanation["keywords"].append({
+                    "keyword": keyword,
+                    "weight": weight
+                })
+        
+        return explanation

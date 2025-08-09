@@ -22,7 +22,7 @@ class LocalLLMService:
         # Local LLM configurations
         self.providers = {
             'ollama': {
-                'url': settings.OLLAMA_HOST,
+                'url': settings.OLLAMA_BASE_URL,
                 'endpoint': '/api/generate',
                 'health_endpoint': '/api/tags',
                 'available': False
@@ -44,9 +44,9 @@ class LocalLLMService:
         # Model configurations
         self.model_configs = {
             'ollama': {
-                'default_model': 'llama3.1:8b',
+                'default_model': 'mistral',
                 'code_model': 'codellama:7b',
-                'chat_model': 'llama3.1:8b'
+                'chat_model': 'mistral'
             },
             'llamacpp': {
                 'default_model': 'llama-2-7b-chat',
@@ -350,22 +350,22 @@ class LocalLLMService:
                         except json.JSONDecodeError:
                             continue
     
-    async def _check_providers(self):
-        """Check availability of local LLM providers"""
-        
+    async def _check_providers(self) -> None:
         for provider_name, config in self.providers.items():
+            health_url = f"{config['url']}{config['health_endpoint']}"
+            print(health_url)
             try:
-                health_url = f"{config['url']}{config['health_endpoint']}"
-                async with self.session.get(health_url, timeout=aiohttp.ClientTimeout(total=5)) as response:
+                timeout = aiohttp.ClientTimeout(total=5)
+                async with self.session.get(health_url, timeout=timeout) as response:
                     if response.status == 200:
                         config['available'] = True
                         logger.info(f"✅ {provider_name} is available")
                     else:
                         config['available'] = False
-                        logger.warning(f"❌ {provider_name} health check failed: {response.status}")
+                        logger.warning(f"❌ {provider_name} health check failed: HTTP {response.status}")
             except Exception as e:
                 config['available'] = False
-                logger.warning(f"❌ {provider_name} is not available: {str(e)}")
+                logger.warning(f"❌ {provider_name} is not available: {e}")
     
     async def get_available_models(self) -> Dict[str, Any]:
         """Get available local models"""

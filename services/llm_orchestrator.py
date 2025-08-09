@@ -1,12 +1,15 @@
 """
-Multi-LLM orchestration service with intelligent response merging
+Multi-LLM Orchestration Service with Intelligent Fallback and Response Merging
 """
-from cachetools import TTLCache
+
+import re
+from enum import Enum
+from typing import List, Dict, Any
 import asyncio
 import json
 import time
+import logging
 from typing import Dict, List, Optional, Any, AsyncGenerator
-import aiohttp
 from dataclasses import dataclass
 
 from core.logger import get_logger
@@ -16,6 +19,31 @@ from services.response_merger import ResponseMerger
 
 logger = get_logger(__name__)
 
+
+class TaskType(Enum):
+    CODE_GENERATION = "code_generation"
+    PROJECT_CREATION = "project_creation"
+    MOBILE_APP = "mobile_app"
+    FILE_OPERATION = "file_operation"
+    CODE_EXECUTION = "code_execution"
+    BUG_FIXING = "bug_fixing"
+    TESTING = "testing"
+    API_CREATION = "api_creation"
+    DATABASE_DESIGN = "database_design"
+    DEPLOYMENT = "deployment"
+    IMAGE_CREATION = "image_creation"
+    VIDEO_CREATION = "video_creation"
+    UI_DESIGN = "ui_design"
+    DATA_ANALYSIS = "data_analysis"
+    RESEARCH = "research"
+    PRESENTATION = "presentation"
+    CONTENT_WRITING = "content_writing"
+    MUSIC_GENERATION = "music_generation"
+    GAME_DEVELOPMENT = "game_development"
+    AUTOMATION = "automation"
+    GENERAL_CHAT = "general_chat"  # fallback
+
+
 @dataclass
 class LLMResponse:
     """LLM response with metadata"""
@@ -24,21 +52,26 @@ class LLMResponse:
     provider: str
     response_time: float
     quality_score: float
+    tokens_used: int
     metadata: Dict[str, Any]
 
 class LLMOrchestrator:
-    """Orchestrates multiple LLMs for optimal response generation"""
+    """Orchestrates multiple LLMs with intelligent fallback and response merging"""
 
     def __init__(self, settings):
         self.settings = settings
         self.local_llm = LocalLLMService(settings)
         self.remote_llm = RemoteLLMService(settings)
         self.response_merger = ResponseMerger(settings)
-
-        # LLM priority and configuration
+        
+        # Configure providers with priorities
+        self.llm_priority = self._configure_providers()
+        
         self.llm_priority = [
             # Local LLMs (via Ollama)
-            {"provider": "local", "model": "mistral", "weight": 1.0},
+            {"provider": "local", "model": "ollama", "weight": 1.0},
+            # You can add more local providers here if needed
+
 
             # Remote LLMs (fallback)
             {"provider": "remote", "model": "together", "weight": 0.7},
@@ -46,133 +79,147 @@ class LLMOrchestrator:
             {"provider": "remote", "model": "groq", "weight": 0.5},
             {"provider": "remote", "model": "huggingface", "weight": 0.4},
             {"provider": "remote", "model": "openai", "weight": 0.3},
-            {"provider": "remote", "model": "anthropic", "weight": 0.2}
+            {"provider": "remote", "model": "anthropic", "weight": 0.2},
+
+            
+            # Free remote LLMs
+            {"provider": "remote", "model": "groq-llama3", "weight": 0.8},
+            {"provider": "remote", "model": "deepseek-coder", "weight": 0.7},
+            {"provider": "remote", "model": "openrouter-mistral", "weight": 0.6},
+
+            # Paid remote LLMs (fallback)
+            {"provider": "remote", "model": "gpt-4", "weight": 0.5},
+            {"provider": "remote", "model": "gpt-3.5-turbo", "weight": 0.4},
+            {"provider": "remote", "model": "claude-3-haiku", "weight": 0.3}
         ]
 
         # Task-specific model preferences
         self.task_preferences = {
-            'code_generation': ['mistral', 'together', 'openai'],
-            'code_fix': ['mistral', 'groq', 'together'],
-            'code_review': ['openai', 'anthropic', 'together'],
-            'research': ['mistral', 'groq', 'together'],
-            'creative': ['openai', 'anthropic', 'together'],
-            'analytical': ['openai', 'groq', 'together'],
-            'conversational': ['mistral', 'groq', 'together']
+            'code_generation': ['llama2', 'codellama', 'deepseek-coder'],
+            'code_fix': ['llama2', 'codellama', 'gpt-3.5-turbo'],
+            'code_review': ['gpt-4', 'claude-3', 'llama3'],
+            'research': ['llama3', 'llama2', 'dolphin'],
+            'creative': ['mythomax', 'dolphin', 'openchat'],
+            'analytical': ['llama3', 'llama2', 'gpt-4'],
+            'conversational': ['llama3', 'llama2', 'claude-3']
         }
-
         # Performance tracking
         self.performance_history = {}
         self.available_models = {}
+        self.failure_counts = {}
 
+    def _configure_providers(self) -> List[Dict[str, Any]]:
+        return [
+            # Local LLMs (use provider keys here!)
+           
+        ]
     
     async def initialize(self):
         """Initialize LLM services"""
         logger.info("Initializing LLM orchestrator...")
         
-        # Initialize local LLM service
+        # Initialize LLM services
         await self.local_llm.initialize()
-        
-        # Initialize remote LLM service
         await self.remote_llm.initialize()
         
         # Check available models
         await self._check_available_models()
         
         logger.info("LLM orchestrator initialized successfully")
+        logger.info(f"Available models: {list(self.available_models.keys())}")
     
     async def generate_response(
         self,
         prompt: str,
         task_type: str = "conversational",
         context: Optional[Dict[str, Any]] = None,
+        user_id: str = "anonymous",
+        prefer_local: bool = True,
         max_models: int = 3,
-        require_consensus: bool = False,
-        temperature=0.7,
-        provider='ollama',
-        model: Optional[str] = None  # <- ADD THIS
+        max_tokens: int = None,
+        temperature: float = None
     ) -> Dict[str, Any]:
-        """Generate response using multiple LLMs with intelligent merging"""
-        
         start_time = time.time()
-        
-        try:
-            # Select best models for this task
-            selected_models = self._select_models_for_task(task_type, max_models)
-            
-            logger.info(f"Generating response with models: {[m['model'] for m in selected_models]}")
-            
-            # Generate responses from multiple LLMs
-            responses = await self._generate_multiple_responses(
-                prompt, selected_models, context
-            )
-            
-            if not responses:
-                raise Exception("No LLM responses generated")
-            print(responses)
-            # Merge responses intelligently
-            merged_response = await self.response_merger.merge_responses(
-                responses, task_type, require_consensus
-            )
-            
-            # Calculate performance scores
-            scores = self._calculate_performance_scores(responses)
-            
-            # Update performance history
-            await self._update_performance_history(responses, scores)
-            
-            processing_time = time.time() - start_time
-            
+        responses = []
+        errors = []
+
+        # Select best models for this task
+        selected_models = self._select_models_for_task(task_type, max_models)
+        logger.info(f"Generating response with models: {[m['model'] for m in selected_models]}")
+
+        for model_config in selected_models:
+            if len(responses) >= max_models:
+                break
+
+            try:
+                if model_config['provider'] == 'local':
+                    response = await self._generate_local_response(
+                        prompt, model_config, context, temperature
+                    )
+                else:
+                    response = await self._generate_remote_response(
+                        prompt, model_config, context, temperature
+                    )
+
+                if response:
+                    responses.append(response)
+                    # Update performance history per response
+                    self._update_performance_history(response.model, True, response.response_time)
+                else:
+                    err_msg = f"{model_config['model']} returned no response"
+                    errors.append(err_msg)
+                    logger.warning(err_msg)
+
+            except Exception as e:
+                error_msg = f"{model_config['model']} failed: {str(e)}"
+                logger.warning(error_msg)
+                errors.append(error_msg)
+                # Update failure count
+                self.failure_counts[model_config['model']] = self.failure_counts.get(model_config['model'], 0) + 1
+
+        # If no model succeeded
+        if not responses:
             return {
-                'text': merged_response['text'],
-                'confidence': merged_response['confidence'],
-                'sources': merged_response['sources'],
-                'scores': scores,
-                'processing_time': processing_time,
-                'models_used': [r.model for r in responses],
-                'metadata': {
-                    'task_type': task_type,
-                    'merge_strategy': merged_response['strategy'],
-                    'consensus_achieved': merged_response.get('consensus', False)
-                }
+                "success": False,
+                "error": "All models failed: " + "; ".join(errors),
+                "models_tried": [m['model'] for m in selected_models]
             }
-            
-        except Exception as e:
-            logger.error(f"LLM orchestration error: {str(e)}")
-            raise
-    
-    async def generate_response_stream(
-        self,
-        prompt: str,
-        task_type: str = "conversational",
-        context: Optional[Dict[str, Any]] = None
-    ) -> AsyncGenerator[str, None]:
-        """Generate streaming response from best available LLM"""
-        
-        try:
-            # Select best single model for streaming
-            selected_models = self._select_models_for_task(task_type, 1)
-            
-            if not selected_models:
-                yield "Error: No available models for streaming"
-                return
-            
-            model_config = selected_models[0]
-            
-            # Stream from selected model
-            if model_config['provider'] == 'local':
-                async for chunk in self.local_llm.generate_stream(
-                    prompt, model_config['model'], context
-                ):
-                    yield chunk
-            else:
-                async for chunk in self.remote_llm.generate_stream(
-                    prompt, model_config['model'], context
-                ):
-                    yield chunk
-                    
-        except Exception as e:
-            logger.error(f"Streaming error: {str(e)}")
-            yield f"Error: {str(e)}"
+
+        require_consensus = False  # Set this based on your logic
+
+        # Merge responses
+        merged_response = await self.response_merger.merge_responses(
+            responses, task_type, require_consensus
+        )
+
+        # Calculate performance scores
+        scores = self._calculate_performance_scores(responses)
+
+        processing_time = time.time() - start_time
+        logger.info(f"Processing time: {processing_time:.2f} seconds")
+        logger.debug(f"Merged response: {merged_response}")
+
+        return {
+            "success": True,
+            "text": merged_response['text'],
+            "confidence": merged_response['confidence'],
+            "sources": merged_response.get('sources', []),
+            "scores": scores,
+            "processing_time": processing_time,
+            "models_used": [r.model for r in responses],
+            "models_failed": [m['model'] for m in selected_models if m['model'] not in [r.model for r in responses]],
+            "metadata": {
+                'task_type': task_type,
+                'merge_strategy': merged_response['strategy'],
+                'consensus_achieved': merged_response.get('consensus', False)
+            }
+        }
+
+    async def generate_response_wrapper(self, prompt: str, **kwargs):
+        detected_task = self.detect_task_type(prompt)
+        task_str = detected_task.value
+        return await self.generate_response(prompt, task_type=task_str, **kwargs)
+
     
     async def _generate_multiple_responses(
         self,
@@ -186,9 +233,9 @@ class LLMOrchestrator:
         
         for model_config in models:
             if model_config['provider'] == 'local':
-                task = self._generate_local_response(prompt, model_config, context)
+                task = self._generate_local_response(prompt, model_config, context , temperature=0.7)
             else:
-                task = self._generate_remote_response(prompt, model_config, context)
+                task = self._generate_remote_response(prompt, model_config, context , temperature=0.7)
             
             tasks.append(task)
         
@@ -210,29 +257,95 @@ class LLMOrchestrator:
             logger.error(f"Multiple response generation error: {str(e)}")
             return []
     
+    async def generate_response_stream(
+        self,
+        prompt: str,
+        task_type: str,
+        context: Optional[Dict[str, Any]] = None,
+        temperature: float = 0.7
+    ) -> AsyncGenerator[str, None]:
+        """Generate streaming response with fallback to other models"""
+        selected_models = self._select_models_for_task(task_type, 3)
+        
+        for model_config in selected_models:
+            try:
+                if model_config['provider'] == 'local':
+                    async for chunk in self.local_llm.generate_stream(
+                        prompt, model_config['model'], context, temperature
+                    ):
+                        yield chunk
+                    return  # Success, stop trying
+                else:
+                    async for chunk in self.remote_llm.generate_stream(
+                        prompt, model_config['model'], context, temperature
+                    ):
+                        yield chunk
+                    return  # Success, stop trying
+            except Exception as e:
+                logger.warning(f"Streaming failed with {model_config['model']}: {str(e)}")
+                # Try next model
+        
+        # If all models failed
+        yield json.dumps({"error": "All streaming models failed"})
+    
+    def _select_models_for_task(self, task_type: str, max_models: int) -> List[Dict[str, Any]]:
+        # Get preferred models list for the task_type string key, fallback to 'conversational'
+        preferred_models = self.task_preferences.get(task_type, self.task_preferences.get('conversational', []))
+        
+        # Get free models based on weight >= 0.6 from llm_priority
+        free_models_set = {entry['model'] for entry in self.llm_priority if entry['weight'] >= 0.6}
+        
+        # Filter preferred models by available free models, keep order
+        filtered_models = [m for m in preferred_models if m in free_models_set]
+        
+        # Prepare model configs from llm_priority for those filtered models
+        selected = []
+        for model in filtered_models:
+            for entry in self.llm_priority:
+                if entry['model'] == model:
+                    selected.append(entry)
+                    break
+            if len(selected) >= max_models:
+                break
+
+        # If no models found (empty), fallback to top free models by weight
+        if not selected:
+            sorted_free = sorted(
+                [entry for entry in self.llm_priority if entry['weight'] >= 0.6],
+                key=lambda e: e['weight'], reverse=True
+            )
+            selected = sorted_free[:max_models]
+
+        return selected
+    
+    
     async def _generate_local_response(
         self,
         prompt: str,
         model_config: Dict[str, Any],
-        context: Optional[Dict[str, Any]]
+        context: Optional[Dict[str, Any]],
+        temperature: float
     ) -> Optional[LLMResponse]:
-        """Generate response from local LLM"""
-        
+        """Generate response from local LLM with fallback handling"""
         try:
             start_time = time.time()
-            
             result = await self.local_llm.generate(
                 prompt, model_config['model'], context
             )
             
+            if not result or "error" in result:
+                return None
+                
             response_time = time.time() - start_time
+            quality_score = self._assess_quality(result['text'])
             
             return LLMResponse(
                 text=result['text'],
                 model=model_config['model'],
                 provider='local',
                 response_time=response_time,
-                quality_score=self._assess_quality(result['text']),
+                quality_score=quality_score,
+                tokens_used=result.get('tokens_used', 0),
                 metadata=result.get('metadata', {})
             )
             
@@ -244,25 +357,29 @@ class LLMOrchestrator:
         self,
         prompt: str,
         model_config: Dict[str, Any],
-        context: Optional[Dict[str, Any]]
+        context: Optional[Dict[str, Any]],
+        temperature: float
     ) -> Optional[LLMResponse]:
-        """Generate response from remote LLM"""
-        
+        """Generate response from remote LLM with fallback handling"""
         try:
             start_time = time.time()
-            
             result = await self.remote_llm.generate(
                 prompt, model_config['model'], context
             )
             
+            if not result or "error" in result:
+                return None
+                
             response_time = time.time() - start_time
+            quality_score = self._assess_quality(result['text'])
             
             return LLMResponse(
                 text=result['text'],
                 model=model_config['model'],
                 provider='remote',
                 response_time=response_time,
-                quality_score=self._assess_quality(result['text']),
+                quality_score=quality_score,
+                tokens_used=result.get('tokens_used', 0),
                 metadata=result.get('metadata', {})
             )
             
@@ -270,112 +387,80 @@ class LLMOrchestrator:
             logger.error(f"Remote LLM error ({model_config['model']}): {str(e)}")
             return None
     
-    def _select_models_for_task(
-        self,
-        task_type: str,
-        max_models: int
-    ) -> List[Dict[str, Any]]:
-        """Select best models for specific task type"""
-        
-        # Get task-specific preferences
-        preferred_models = self.task_preferences.get(task_type, [])
-        
-        # Filter available models by preferences
-        selected = []
-        
-        # First, add preferred models if available
-        for model_name in preferred_models:
-            for model_config in self.llm_priority:
-                if (model_config['model'] == model_name and 
-                    model_config['model'] in self.available_models):
-                    selected.append(model_config)
-                    break
-        
-        # Fill remaining slots with best available models
-        for model_config in self.llm_priority:
-            if (len(selected) >= max_models):
-                break
-            
-            if (model_config not in selected and 
-                model_config['model'] in self.available_models):
-                selected.append(model_config)
-        
-        return selected[:max_models]
-    
     def _assess_quality(self, text: str) -> float:
-        """Assess response quality (simple heuristic)"""
+        """Assess response quality using heuristics (0.0-1.0)"""
         if not text:
             return 0.0
-        
-        # Basic quality metrics
+            
+        # Length-based scoring
         word_count = len(text.split())
+        length_score = min(word_count / 200, 1.0)  # Normalize to 200 words
+        
+        # Structure-based scoring
         sentence_count = len([s for s in text.split('.') if s.strip()])
+        structure_score = min(sentence_count / 8, 1.0)  # Normalize to 8 sentences
         
-        # Quality factors
-        length_score = min(word_count / 100, 1.0)  # Normalize to 100 words
-        structure_score = min(sentence_count / 5, 1.0)  # Normalize to 5 sentences
-        
-        # Check for code blocks, lists, etc.
+        # Formatting-based scoring
         format_score = 0.0
-        if '```' in text:
-            format_score += 0.2
+        if '```' in text:  # Code blocks
+            format_score += 0.3
         if any(line.strip().startswith(('- ', '* ', '1. ')) for line in text.split('\n')):
+            format_score += 0.2  # Lists
+        if '|' in text and '\n' in text:  # Potential table
             format_score += 0.1
         
-        return min((length_score + structure_score + format_score) / 2, 1.0)
+        # Combined score with weights
+        return min((
+            length_score * 0.4 + 
+            structure_score * 0.4 + 
+            format_score * 0.2
+        ), 1.0)
     
     def _calculate_performance_scores(
         self,
         responses: List[LLMResponse]
     ) -> Dict[str, float]:
         """Calculate performance scores for each model"""
-        
         scores = {}
         
         for response in responses:
             # Combine quality and speed scores
-            speed_score = max(0, 1 - (response.response_time / 10))  # Normalize to 10 seconds
-            quality_score = response.quality_score
-            
-            # Weighted combination
-            overall_score = (quality_score * 0.7) + (speed_score * 0.3)
-            
-            scores[response.model] = overall_score
+            speed_score = max(0, 1 - (response.response_time / 15))  # Normalize to 15 seconds
+            overall_score = (response.quality_score * 0.7) + (speed_score * 0.3)
+            scores[response.model] = round(overall_score, 2)
         
         return scores
     
-    async def _update_performance_history(
+    def _update_performance_history(
         self,
-        responses: List[LLMResponse],
-        scores: Dict[str, float]
+        model_name: str,
+        success: bool,
+        response_time: float
     ):
         """Update performance history for model selection optimization"""
+        if model_name not in self.performance_history:
+            self.performance_history[model_name] = {
+                'scores': [],
+                'response_times': [],
+                'success_count': 0,
+                'failure_count': 0,
+                'total_count': 0
+            }
         
-        for response in responses:
-            model_name = response.model
-            
-            if model_name not in self.performance_history:
-                self.performance_history[model_name] = {
-                    'scores': [],
-                    'response_times': [],
-                    'success_count': 0,
-                    'total_count': 0
-                }
-            
-            history = self.performance_history[model_name]
-            history['scores'].append(scores[model_name])
-            history['response_times'].append(response.response_time)
+        history = self.performance_history[model_name]
+        history['total_count'] += 1
+        
+        if success:
             history['success_count'] += 1
-            history['total_count'] += 1
-            
-            # Keep only last 100 entries
-            if len(history['scores']) > 100:
-                history['scores'] = history['scores'][-100:]
+            history['response_times'].append(response_time)
+            # Keep only last 100 response times
+            if len(history['response_times']) > 100:
                 history['response_times'] = history['response_times'][-100:]
+        else:
+            history['failure_count'] += 1
     
     async def _check_available_models(self):
         """Check which models are available"""
-        
         # Check local models
         local_models = await self.local_llm.get_available_models()
         
@@ -385,20 +470,22 @@ class LLMOrchestrator:
         # Combine all available models
         self.available_models = {**local_models, **remote_models}
         
-        logger.info(f"Available models: {list(self.available_models.keys())}")
+        # Initialize failure counts
+        for model in self.available_models:
+            self.failure_counts.setdefault(model, 0)
     
     async def get_available_models(self) -> Dict[str, Any]:
         """Get available models and their status"""
         return {
-            'local': await self.local_llm.get_available_models(),
-            'remote': await self.remote_llm.get_available_models(),
-            'performance_history': self.performance_history
+            'models': list(self.available_models.keys()),
+            'performance_history': self.performance_history,
+            'failure_counts': self.failure_counts
         }
     
     async def health_check(self) -> Dict[str, Any]:
         """Health check for LLM orchestrator"""
         return {
-            'status': 'healthy',
+            'status': 'healthy' if self.available_models else 'degraded',
             'available_models': len(self.available_models),
             'local_llm_status': await self.local_llm.health_check(),
             'remote_llm_status': await self.remote_llm.health_check()
