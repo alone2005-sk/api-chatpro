@@ -1,0 +1,93 @@
+{
+  "timestamp": "2025-08-09T17:52:55.022225",
+  "total_tests": 10,
+  "passed": 1,
+  "failed": 9,
+  "test_results": {
+    "health_check": {
+      "status": 401,
+      "data": {
+        "detail": "Security verification failed"
+      }
+    },
+    "root_endpoint": {
+      "status": 401,
+      "data": {
+        "detail": "Security verification failed"
+      }
+    },
+    "chat_endpoint": {
+      "status": 200,
+      "data": {
+        "success": true,
+        "chat_id": "408a8c64-3d58-4859-aef4-7e5b08493780",
+        "message_id": "e5ec84cc-6ef5-498b-bae0-3ff3aa9e321b",
+        "response": "Hello! This is a test message from me! How can I assist you today?",
+        "response_type": "text",
+        "project_id": null,
+        "media_files": [],
+        "research_session_id": null,
+        "code": null,
+        "language": null,
+        "audio_file": null,
+        "research_data": null,
+        "execution_results": null,
+        "model_used": null,
+        "processing_time": 0.6043682098388672,
+        "tokens_used": 0,
+        "confidence_score": 0.07800000000000001,
+        "llm_scores": {
+          "together": 0.34
+        },
+        "learning_applied": false,
+        "patterns_used": 0,
+        "sources": [],
+        "metadata": {
+          "processed_files": 0,
+          "research_performed": false
+        },
+        "timestamp": "2025-08-09T17:52:55.638356"
+      }
+    },
+    "media_generation": {
+      "status": 405,
+      "data": {
+        "detail": "Method Not Allowed"
+      }
+    },
+    "research_endpoint": {
+      "status": 500,
+      "data": {
+        "detail": "'NoneType' object has no attribute 'conduct_research'"
+      }
+    },
+    "chat_history": {
+      "status": 500,
+      "data": {
+        "detail": "'Chat' object has no attribute 'to_dict'"
+      }
+    },
+    "models_endpoint": {
+      "status": 404,
+      "data": {
+        "detail": "Not Found"
+      }
+    },
+    "stats_endpoint": {
+      "status": 500,
+      "data": {
+        "detail": "'LLMOrchestrator' object has no attribute 'get_provider_stats'"
+      }
+    },
+    "cloud_storage_auth": {
+      "status": 404,
+      "data": {
+        "detail": "Not Found"
+      }
+    },
+    "streaming_chat": {
+      "status": "error",
+      "error": "Response payload is not completed"
+    }
+  }
+}

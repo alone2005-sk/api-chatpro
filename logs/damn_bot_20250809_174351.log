@@ -1,0 +1,54 @@
+2025-08-09 17:43:51,380 - __mp_main__ - WARNING - Could not mount generated_projects: Directory 'generated_projects' does not exist
+2025-08-09 17:43:51,593 - stevedore.extension - ERROR - Could not load 'sarif': No module named 'sarif_om'
+2025-08-09 17:43:52,343 - middleware.security - INFO - SecurityMiddleware initialized with secret_key: default_secret
+2025-08-09 17:43:52,343 - main - INFO - 🚀 Starting DAMN BOT AI Chat Agent...
+2025-08-09 17:43:52,448 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-08-09 17:43:52,448 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-08-09 17:43:52,449 - services.local_llm_service - WARNING - ❌ ollama is not available: Cannot connect to host localhost:11434 ssl:default [Connection refused]
+2025-08-09 17:43:52,450 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-09 17:43:52,450 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-09 17:43:52,450 - services.local_llm_service - INFO - Local LLM service initialized
+2025-08-09 17:43:52,450 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-08-09 17:43:53,232 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-09 17:43:53,563 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-09 17:43:53,903 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-09 17:43:54,132 - services.remote_llm_service - INFO - ✅ huggingface is available
+2025-08-09 17:43:54,433 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-09 17:43:54,749 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-09 17:43:54,749 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-08-09 17:43:54,749 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-08-09 17:43:54,749 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-08-09 17:43:54,762 - services.self_learning - INFO - Initializing Self-Learning Service...
+2025-08-09 17:43:54,791 - services.self_learning - INFO - Loaded knowledge base with 0 high-quality interactions
+2025-08-09 17:43:54,791 - services.self_learning - INFO - ✅ Self-Learning Service initialized successfully
+2025-08-09 17:43:54,791 - services.project_generator - INFO - Initializing Project Generation Service...
+2025-08-09 17:43:54,791 - services.project_generator - INFO - ✅ Project Generation Service initialized successfully
+2025-08-09 17:43:54,791 - services.image_video_generator - INFO - Initializing Image/Video Generation Service...
+2025-08-09 17:43:54,792 - services.image_video_generator - INFO - Testing media generation provider availability...
+2025-08-09 17:43:54,792 - services.image_video_generator - INFO -   Image - huggingface: ✅ Available
+2025-08-09 17:43:54,792 - services.image_video_generator - INFO -   Image - replicate: ❌ Disabled (no API key)
+2025-08-09 17:43:54,792 - services.self_learning - INFO - Starting background learning loop...
+2025-08-09 17:43:54,793 - services.image_video_generator - INFO -   Image - automatic1111: ❌ Unavailable
+2025-08-09 17:43:54,793 - services.image_video_generator - INFO -   Video - replicate_video: ❌ Disabled (no API key)
+2025-08-09 17:43:54,793 - services.image_video_generator - INFO - ✅ Image/Video Generation Service initialized successfully
+2025-08-09 17:43:54,794 - main - INFO - ✅ DAMN BOT AI Chat Agent is ready!
+2025-08-09 17:43:54,794 - services.self_learning - INFO - Knowledge base optimization completed
+2025-08-09 17:43:54,794 - services.self_learning - INFO - Knowledge base saved with 0 pattern groups
+2025-08-09 17:43:55,150 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwiaWF0IjoxNzU0NzYxNDM1LCJleHAiOjE3NTQ3NjUwMzV9.rSCbt1GN-bS_iJ4YO-lXl2vjw0tJoKtpWB2PtO4VFX8
+2025-08-09 17:43:55,150 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'iat': 1754761435, 'exp': 1754765035}
+2025-08-09 17:43:55,151 - services.image_video_generator - INFO - Generating image: A surreal fantasy scene of a colossal dragon emerging from a glowing crystal cavern, surrounded by f...
+2025-08-09 17:43:55,151 - services.llm_orchestrator - INFO - Generating response with models: ['ollama', 'groq-llama3', 'together']
+2025-08-09 17:43:55,151 - services.llm_orchestrator - ERROR - Local LLM error (ollama): Local model ollama is not available
+2025-08-09 17:43:55,151 - services.llm_orchestrator - WARNING - ollama returned no response
+2025-08-09 17:43:55,152 - services.llm_orchestrator - ERROR - Remote LLM error (groq-llama3): Unknown remote model: groq-llama3
+2025-08-09 17:43:55,152 - services.llm_orchestrator - WARNING - groq-llama3 returned no response
+2025-08-09 17:43:56,635 - services.llm_orchestrator - INFO - Processing time: 1.48 seconds
+2025-08-09 17:44:24,797 - services.self_learning - INFO - Knowledge base optimization completed
+2025-08-09 17:44:24,797 - services.self_learning - INFO - Knowledge base saved with 0 pattern groups
+2025-08-09 17:44:54,799 - services.self_learning - INFO - Knowledge base optimization completed
+2025-08-09 17:44:54,799 - services.self_learning - INFO - Knowledge base saved with 0 pattern groups
+2025-08-09 17:45:24,801 - services.self_learning - INFO - Knowledge base optimization completed
+2025-08-09 17:45:24,801 - services.self_learning - INFO - Knowledge base saved with 0 pattern groups
+2025-08-09 17:45:54,802 - services.self_learning - INFO - Knowledge base optimization completed
+2025-08-09 17:45:54,802 - services.self_learning - INFO - Knowledge base saved with 0 pattern groups
+2025-08-09 17:46:24,473 - main - INFO - 🔄 Shutting down DAMN BOT...

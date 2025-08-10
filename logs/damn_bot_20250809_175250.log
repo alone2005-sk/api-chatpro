@@ -1,0 +1,74 @@
+2025-08-09 17:52:50,351 - __mp_main__ - WARNING - Could not mount generated_projects: Directory 'generated_projects' does not exist
+2025-08-09 17:52:50,562 - stevedore.extension - ERROR - Could not load 'sarif': No module named 'sarif_om'
+2025-08-09 17:52:51,291 - middleware.security - INFO - SecurityMiddleware initialized with secret_key: default_secret
+2025-08-09 17:52:51,291 - main - INFO - 🚀 Starting DAMN BOT AI Chat Agent...
+2025-08-09 17:52:51,399 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-08-09 17:52:51,399 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-08-09 17:52:51,400 - services.local_llm_service - WARNING - ❌ ollama is not available: Cannot connect to host localhost:11434 ssl:default [Connection refused]
+2025-08-09 17:52:51,400 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-09 17:52:51,401 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-09 17:52:51,401 - services.local_llm_service - INFO - Local LLM service initialized
+2025-08-09 17:52:51,401 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-08-09 17:52:52,818 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-09 17:52:53,156 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-09 17:52:53,490 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-09 17:52:54,201 - services.remote_llm_service - INFO - ✅ huggingface is available
+2025-08-09 17:52:54,559 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-09 17:52:54,914 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-09 17:52:54,914 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-08-09 17:52:54,915 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-08-09 17:52:54,915 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-08-09 17:52:54,927 - services.self_learning - INFO - Initializing Self-Learning Service...
+2025-08-09 17:52:54,962 - services.self_learning - INFO - Loaded knowledge base with 0 high-quality interactions
+2025-08-09 17:52:54,962 - services.self_learning - INFO - ✅ Self-Learning Service initialized successfully
+2025-08-09 17:52:54,962 - services.project_generator - INFO - Initializing Project Generation Service...
+2025-08-09 17:52:54,962 - services.project_generator - INFO - ✅ Project Generation Service initialized successfully
+2025-08-09 17:52:54,963 - services.image_video_generator - INFO - Initializing Image/Video Generation Service...
+2025-08-09 17:52:54,963 - services.image_video_generator - INFO - Testing media generation provider availability...
+2025-08-09 17:52:54,963 - services.image_video_generator - INFO -   Image - huggingface: ✅ Available
+2025-08-09 17:52:54,963 - services.image_video_generator - INFO -   Image - replicate: ❌ Disabled (no API key)
+2025-08-09 17:52:54,963 - services.self_learning - INFO - Starting background learning loop...
+2025-08-09 17:52:54,965 - services.image_video_generator - INFO -   Image - automatic1111: ❌ Unavailable
+2025-08-09 17:52:54,965 - services.image_video_generator - INFO -   Video - replicate_video: ❌ Disabled (no API key)
+2025-08-09 17:52:54,965 - services.image_video_generator - INFO - ✅ Image/Video Generation Service initialized successfully
+2025-08-09 17:52:54,965 - main - INFO - ✅ DAMN BOT AI Chat Agent is ready!
+2025-08-09 17:52:54,966 - services.self_learning - INFO - Knowledge base optimization completed
+2025-08-09 17:52:54,966 - services.self_learning - INFO - Knowledge base saved with 0 pattern groups
+2025-08-09 17:52:55,029 - middleware.security - ERROR - Missing Authorization header
+2025-08-09 17:52:55,029 - middleware.security - ERROR - Security verification failed: 
+2025-08-09 17:52:55,031 - middleware.security - ERROR - Missing Authorization header
+2025-08-09 17:52:55,031 - middleware.security - ERROR - Security verification failed: 
+2025-08-09 17:52:55,032 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwidXNlcm5hbWUiOiJ0ZXN0X3VzZXIiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJleHAiOjE3NTQ3NjU1NzUsImlhdCI6MTc1NDc2MTk3NSwic3ViIjoidGVzdF91c2VyIn0.ab7zjufTq6FJzY1RdGXeOr_7NDq93DHNPm01WPDmYlU
+2025-08-09 17:52:55,032 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'username': 'test_user', 'email': 'test@example.com', 'exp': 1754765575, 'iat': 1754761975, 'sub': 'test_user'}
+2025-08-09 17:52:55,050 - services.chat_service - INFO - Detected task: GENERAL_CHAT (confidence: 0.50, complexity: 2, language: None)
+2025-08-09 17:52:55,051 - services.llm_orchestrator - INFO - Generating response with models: ['ollama', 'groq-llama3', 'together']
+2025-08-09 17:52:55,051 - services.llm_orchestrator - ERROR - Local LLM error (ollama): Local model ollama is not available
+2025-08-09 17:52:55,051 - services.llm_orchestrator - WARNING - ollama returned no response
+2025-08-09 17:52:55,051 - services.llm_orchestrator - ERROR - Remote LLM error (groq-llama3): Unknown remote model: groq-llama3
+2025-08-09 17:52:55,051 - services.llm_orchestrator - WARNING - groq-llama3 returned no response
+2025-08-09 17:52:55,623 - services.llm_orchestrator - INFO - Processing time: 0.57 seconds
+2025-08-09 17:52:55,646 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwidXNlcm5hbWUiOiJ0ZXN0X3VzZXIiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJleHAiOjE3NTQ3NjU1NzUsImlhdCI6MTc1NDc2MTk3NSwic3ViIjoidGVzdF91c2VyIn0.ab7zjufTq6FJzY1RdGXeOr_7NDq93DHNPm01WPDmYlU
+2025-08-09 17:52:55,646 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'username': 'test_user', 'email': 'test@example.com', 'exp': 1754765575, 'iat': 1754761975, 'sub': 'test_user'}
+2025-08-09 17:52:55,648 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwidXNlcm5hbWUiOiJ0ZXN0X3VzZXIiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJleHAiOjE3NTQ3NjU1NzUsImlhdCI6MTc1NDc2MTk3NSwic3ViIjoidGVzdF91c2VyIn0.ab7zjufTq6FJzY1RdGXeOr_7NDq93DHNPm01WPDmYlU
+2025-08-09 17:52:55,649 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'username': 'test_user', 'email': 'test@example.com', 'exp': 1754765575, 'iat': 1754761975, 'sub': 'test_user'}
+2025-08-09 17:52:55,654 - main - ERROR - Research error: 'NoneType' object has no attribute 'conduct_research'
+2025-08-09 17:52:55,656 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwidXNlcm5hbWUiOiJ0ZXN0X3VzZXIiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJleHAiOjE3NTQ3NjU1NzUsImlhdCI6MTc1NDc2MTk3NSwic3ViIjoidGVzdF91c2VyIn0.ab7zjufTq6FJzY1RdGXeOr_7NDq93DHNPm01WPDmYlU
+2025-08-09 17:52:55,656 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'username': 'test_user', 'email': 'test@example.com', 'exp': 1754765575, 'iat': 1754761975, 'sub': 'test_user'}
+2025-08-09 17:52:55,659 - main - ERROR - Get user chats error: 'Chat' object has no attribute 'to_dict'
+2025-08-09 17:52:55,660 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwidXNlcm5hbWUiOiJ0ZXN0X3VzZXIiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJleHAiOjE3NTQ3NjU1NzUsImlhdCI6MTc1NDc2MTk3NSwic3ViIjoidGVzdF91c2VyIn0.ab7zjufTq6FJzY1RdGXeOr_7NDq93DHNPm01WPDmYlU
+2025-08-09 17:52:55,660 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'username': 'test_user', 'email': 'test@example.com', 'exp': 1754765575, 'iat': 1754761975, 'sub': 'test_user'}
+2025-08-09 17:52:55,662 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwidXNlcm5hbWUiOiJ0ZXN0X3VzZXIiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJleHAiOjE3NTQ3NjU1NzUsImlhdCI6MTc1NDc2MTk3NSwic3ViIjoidGVzdF91c2VyIn0.ab7zjufTq6FJzY1RdGXeOr_7NDq93DHNPm01WPDmYlU
+2025-08-09 17:52:55,662 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'username': 'test_user', 'email': 'test@example.com', 'exp': 1754765575, 'iat': 1754761975, 'sub': 'test_user'}
+2025-08-09 17:52:55,662 - main - ERROR - Stats error: 'LLMOrchestrator' object has no attribute 'get_provider_stats'
+2025-08-09 17:52:55,663 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwidXNlcm5hbWUiOiJ0ZXN0X3VzZXIiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJleHAiOjE3NTQ3NjU1NzUsImlhdCI6MTc1NDc2MTk3NSwic3ViIjoidGVzdF91c2VyIn0.ab7zjufTq6FJzY1RdGXeOr_7NDq93DHNPm01WPDmYlU
+2025-08-09 17:52:55,663 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'username': 'test_user', 'email': 'test@example.com', 'exp': 1754765575, 'iat': 1754761975, 'sub': 'test_user'}
+2025-08-09 17:52:55,665 - middleware.security - INFO - Decoding token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyIiwidXNlcm5hbWUiOiJ0ZXN0X3VzZXIiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJleHAiOjE3NTQ3NjU1NzUsImlhdCI6MTc1NDc2MTk3NSwic3ViIjoidGVzdF91c2VyIn0.ab7zjufTq6FJzY1RdGXeOr_7NDq93DHNPm01WPDmYlU
+2025-08-09 17:52:55,665 - middleware.security - INFO - Token decoded payload: {'user_id': 'test_user', 'username': 'test_user', 'email': 'test@example.com', 'exp': 1754765575, 'iat': 1754761975, 'sub': 'test_user'}
+2025-08-09 17:53:24,967 - services.self_learning - INFO - Processing 1 learning interactions...
+2025-08-09 17:53:24,968 - services.llm_orchestrator - INFO - Generating response with models: ['ollama', 'groq-llama3', 'together']
+2025-08-09 17:53:24,968 - services.llm_orchestrator - ERROR - Local LLM error (ollama): Local model ollama is not available
+2025-08-09 17:53:24,968 - services.llm_orchestrator - WARNING - ollama returned no response
+2025-08-09 17:53:24,968 - services.llm_orchestrator - ERROR - Remote LLM error (groq-llama3): Unknown remote model: groq-llama3
+2025-08-09 17:53:24,968 - services.llm_orchestrator - WARNING - groq-llama3 returned no response
+2025-08-09 17:53:27,041 - services.llm_orchestrator - INFO - Processing time: 2.07 seconds
+2025-08-09 17:54:15,529 - main - INFO - 🔄 Shutting down DAMN BOT...

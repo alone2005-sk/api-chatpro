@@ -1,0 +1,39 @@
+2025-08-09 17:37:31,362 - middleware.security - INFO - SecurityMiddleware initialized with secret_key: default_secret
+2025-08-09 17:37:31,362 - main - INFO - 🚀 Starting DAMN BOT AI Chat Agent...
+2025-08-09 17:37:31,378 - services.llm_orchestrator - INFO - Initializing LLM orchestrator...
+2025-08-09 17:37:31,379 - services.local_llm_service - INFO - Initializing local LLM service...
+2025-08-09 17:37:31,380 - services.local_llm_service - WARNING - ❌ ollama is not available: Cannot connect to host localhost:11434 ssl:default [Connection refused]
+2025-08-09 17:37:31,380 - services.local_llm_service - WARNING - ❌ llamacpp is not available: localhost:8080/health
+2025-08-09 17:37:31,380 - services.local_llm_service - WARNING - ❌ gpt4all is not available: localhost:4891/health
+2025-08-09 17:37:31,380 - services.local_llm_service - INFO - Local LLM service initialized
+2025-08-09 17:37:31,380 - services.remote_llm_service - INFO - Initializing remote LLM service...
+2025-08-09 17:37:32,371 - services.remote_llm_service - INFO - ✅ together is available
+2025-08-09 17:37:33,441 - services.remote_llm_service - INFO - ✅ openrouter is available
+2025-08-09 17:37:33,774 - services.remote_llm_service - INFO - ✅ groq is available
+2025-08-09 17:37:34,408 - services.remote_llm_service - INFO - ✅ huggingface is available
+2025-08-09 17:37:34,766 - services.remote_llm_service - INFO - ✅ openai is available
+2025-08-09 17:37:35,077 - services.remote_llm_service - INFO - ✅ anthropic is available
+2025-08-09 17:37:35,077 - services.remote_llm_service - INFO - Remote LLM service initialized
+2025-08-09 17:37:35,077 - services.llm_orchestrator - INFO - LLM orchestrator initialized successfully
+2025-08-09 17:37:35,077 - services.llm_orchestrator - INFO - Available models: ['ollama', 'llamacpp', 'gpt4all', 'together', 'openrouter', 'groq', 'huggingface', 'openai', 'anthropic']
+2025-08-09 17:37:35,090 - services.self_learning - INFO - Initializing Self-Learning Service...
+2025-08-09 17:37:35,118 - services.self_learning - INFO - Loaded knowledge base with 0 high-quality interactions
+2025-08-09 17:37:35,118 - services.self_learning - INFO - ✅ Self-Learning Service initialized successfully
+2025-08-09 17:37:35,118 - services.project_generator - INFO - Initializing Project Generation Service...
+2025-08-09 17:37:35,118 - services.project_generator - INFO - ✅ Project Generation Service initialized successfully
+2025-08-09 17:37:35,118 - services.image_video_generator - INFO - Initializing Image/Video Generation Service...
+2025-08-09 17:37:35,118 - services.image_video_generator - INFO - Testing media generation provider availability...
+2025-08-09 17:37:35,119 - services.image_video_generator - INFO -   Image - huggingface: ✅ Available
+2025-08-09 17:37:35,119 - services.image_video_generator - INFO -   Image - replicate: ❌ Disabled (no API key)
+2025-08-09 17:37:35,119 - services.self_learning - INFO - Starting background learning loop...
+2025-08-09 17:37:35,120 - services.image_video_generator - INFO -   Image - automatic1111: ❌ Unavailable
+2025-08-09 17:37:35,120 - services.image_video_generator - INFO -   Video - replicate_video: ❌ Disabled (no API key)
+2025-08-09 17:37:35,120 - services.image_video_generator - INFO - ✅ Image/Video Generation Service initialized successfully
+2025-08-09 17:37:35,121 - main - INFO - ✅ DAMN BOT AI Chat Agent is ready!
+2025-08-09 17:37:35,125 - middleware.security - ERROR - Missing Authorization header
+2025-08-09 17:37:35,125 - middleware.security - ERROR - Security verification failed: 
+2025-08-09 17:37:35,126 - services.self_learning - INFO - Knowledge base optimization completed
+2025-08-09 17:37:35,126 - services.self_learning - INFO - Knowledge base saved with 0 pattern groups
+2025-08-09 17:37:46,675 - middleware.security - ERROR - Missing Authorization header
+2025-08-09 17:37:46,675 - middleware.security - ERROR - Security verification failed: 
+2025-08-09 17:37:51,853 - main - INFO - 🔄 Shutting down DAMN BOT...
