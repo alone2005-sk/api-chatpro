@@ -1,2 +1,0 @@
-2025-08-09 17:30:51,697 - __mp_main__ - WARNING - Could not mount generated_projects: Directory 'generated_projects' does not exist
-2025-08-09 17:30:51,920 - stevedore.extension - ERROR - Could not load 'sarif': No module named 'sarif_om'
